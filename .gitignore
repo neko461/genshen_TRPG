@@ -1,0 +1,31 @@
+# Dependencies and generated build/test output
+node_modules/
+coverage/
+dist/
+*.tgz
+*.log
+
+# Local campaigns, personal data, and configuration backups
+/save/
+/user/
+/archive/
+/DSH配置迁移前-package.json
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editor, runtime and collaboration state
+.idea/
+.vscode/
+.codex/
+.agents/
+.dsh/
+.beichen_editing
+*.tmp
+*.lock
+!package-lock.json
+!npm-shrinkwrap.json
+.DS_Store
+Thumbs.db
