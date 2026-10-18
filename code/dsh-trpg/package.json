@@ -1,7 +1,7 @@
 {
   "name": "dsh-trpg",
-  "version": "0.0.1",
-  "description": "genshen_TRPG_v0.01：本地首测与 DSH AI GM 工具，共用持久化规则运行时",
+  "version": "0.0.2",
+  "description": "genshen_TRPG_v0.02：本地跑团与 DSH AI GM 工具，共用持久化规则运行时",
   "keywords": [
     "dsh",
     "dsh-plugin",
@@ -39,6 +39,7 @@
       "inject": [
         "@deepseek-ai/dsh-client-ui-renderer",
         "@deepseek-ai/dsh-client-ui-tool",
+        "@deepseek-ai/dsh-api-session-controller",
         "@deepseek-ai/dsh-client-ui-conversation"
       ],
       "platform": "web"

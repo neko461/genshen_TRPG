@@ -3,6 +3,7 @@ import { actorOf, activeScene, outsideBattle, integer, nonempty, requireValue as
 import { makeArtifact, upgradeArtifact, ARTIFACT_SETS } from './gear.js'
 import { requireTurn, endAction } from './battle.js'
 import { WEAPONS } from './rules.js'
+import { sceneCharacters, battleCharacters } from './participation.js'
 
 export const ITEM_TYPES = ['料理', '药剂', '绷带', '机关材料', '圣遗物', '武器']
 export function grantItem(s, item) {
@@ -30,10 +31,21 @@ export function grantItem(s, item) {
 }
 export function takeItem(s, id, count = 1) {
   safeId(id, '物品编号')
+  integer(count, 1, 1000, '移出数量')
   const item = s.inventory[id]
   need(item && item.quantity >= count, '物品不足或不存在')
   item.quantity -= count
   return item
+}
+/** 转交只减少共享库存，不冒充使用/治疗，也不要求给叙事NPC创建角色卡。 */
+export function transferItem(s, input) {
+  outsideBattle(s)
+  const recipient = nonempty(input.recipient, '接收者', 120)
+  need(!Object.values(s.characters).some(a => a.id === recipient || a.name === recipient), '队内物品为共享库存，无须转交；此操作仅用于交给队外接收者')
+  const reason = nonempty(input.reason, '转交依据')
+  const quantity = integer(input.quantity ?? 1, 1, 1000, '转交数量')
+  const item = takeItem(s, input.item, quantity)
+  return { transfer: { item: item.id, name: item.name, quantity, recipient, reason }, remaining: item.quantity }
 }
 export function useItem(s, input) {
   const scene = activeScene(s)
@@ -41,6 +53,8 @@ export function useItem(s, input) {
   const battle = s.battle && !s.battle.over
   if (battle) requireTurn(s, actor.id)
   const target = actorOf(s, input.target ?? actor.id)
+  const participants = battle ? battleCharacters(s) : sceneCharacters(s)
+  need(participants.some(a => a.id === actor.id) && participants.some(a => a.id === target.id), '物品使用者和目标须在当前场景或战斗')
   const item = s.inventory[input.item]
   need(item && item.quantity > 0, '物品不足')
   const usage = scene.itemUses ??= {}

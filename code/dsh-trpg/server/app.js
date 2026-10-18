@@ -2,6 +2,7 @@ import http from 'node:http'
 import fs from 'node:fs'
 import { randomBytes } from 'node:crypto'
 import { Runtime, VERSION } from '../engine/runtime.js'
+import { branchCheckpoint, createCheckpoint, listCheckpoints } from '../engine/checkpoints.js'
 
 export function createServer({ root, runtime = new Runtime({ root }) } = {}) {
   const token = randomBytes(24).toString('hex')
@@ -23,7 +24,7 @@ export function createServer({ root, runtime = new Runtime({ root }) } = {}) {
       res.end(fs.readFileSync(new URL(`../web/${name}`, import.meta.url)))
       return
     }
-    if (req.method !== 'POST' || req.url !== '/api') return reply(404, { error: '未找到接口' })
+    if (req.method !== 'POST' || !['/api', '/api/checkpoints'].includes(req.url)) return reply(404, { error: '未找到接口' })
     if (req.headers['x-trpg-token'] !== token) return reply(403, { error: '连接令牌无效，请刷新页面' })
     if (!req.headers['content-type']?.startsWith('application/json')) return reply(415, { error: '只接受 JSON' })
     try {
@@ -33,7 +34,17 @@ export function createServer({ root, runtime = new Runtime({ root }) } = {}) {
         if (length > 65536) return reply(413, { error: '请求过大' })
       }
       const raw = Buffer.concat(chunks).toString('utf8')
-      const result = runtime.execute(JSON.parse(raw))
+      const request = JSON.parse(raw)
+      let result
+      if (req.url === '/api/checkpoints') {
+        const { op, mode, slot } = request
+        // Use the same resolved root as Runtime, including callers that inject a Runtime directly.
+        const saveRoot = runtime.root
+        if (op === 'list') result = { checkpoints: listCheckpoints(saveRoot, mode, slot) }
+        else if (op === 'save') result = { checkpoint: createCheckpoint(saveRoot, mode, slot, request.name, request.description, request.conversation) }
+        else if (op === 'branch') result = branchCheckpoint(saveRoot, mode, slot, request.checkpointId, request.targetSlot)
+        else throw new Error('未知回溯点操作')
+      } else result = runtime.execute(request)
       reply(200, { ok: true, result })
     } catch (e) { reply(400, { ok: false, error: e.message }) }
   })

@@ -1,0 +1,646 @@
+{
+  "version": "genshen_TRPG_v0.02",
+  "builtAt": "2026-10-18T12:56:58.306Z",
+  "files": [
+    {
+      "path": "code/dsh-trpg/engine/battle.js",
+      "bytes": 18205,
+      "sha256": "23d64e6bb611d3effc6f46f5cc1374612ab8b6a9403761a82281fee2901335c6"
+    },
+    {
+      "path": "code/dsh-trpg/engine/campaign.js",
+      "bytes": 11314,
+      "sha256": "e5716925936c2fc86adfe928d8f68eca28b1ef06d46d4d8927f3ba5890833b05"
+    },
+    {
+      "path": "code/dsh-trpg/engine/character.js",
+      "bytes": 12534,
+      "sha256": "6c2122848081cf56994332534d414af365dfcac34d932f84fbe15cba9712dedc"
+    },
+    {
+      "path": "code/dsh-trpg/engine/checkpoints.js",
+      "bytes": 6468,
+      "sha256": "7ce00318f205a96b8ee8705e9c984e01cad6fd7f3b9b58c92c00ab100242a3a7"
+    },
+    {
+      "path": "code/dsh-trpg/engine/combat.js",
+      "bytes": 12186,
+      "sha256": "fc5b0b816aada54667c48e98111db40f9028630d1c970f2af88de5d48750be1e"
+    },
+    {
+      "path": "code/dsh-trpg/engine/damage.js",
+      "bytes": 8379,
+      "sha256": "6ea778c097055825eb6590e0a0dc8dcafd0f9a83d44d8fa01a951f3f12cf7156"
+    },
+    {
+      "path": "code/dsh-trpg/engine/dice.js",
+      "bytes": 9637,
+      "sha256": "21e5f02789d4f4fb8bac61d1d45e218957ea4966777bf1dc2e6d8d3e579be240"
+    },
+    {
+      "path": "code/dsh-trpg/engine/enemies.js",
+      "bytes": 3863,
+      "sha256": "48db9a888b9175cf50be3dc64bdacb46370e266cd055eb00866f7401627a7e6e"
+    },
+    {
+      "path": "code/dsh-trpg/engine/gear.js",
+      "bytes": 10522,
+      "sha256": "53b12e4b1e5adfa945da4421c2cc3cce0df170725b8bffc6413be6c41f1d4b56"
+    },
+    {
+      "path": "code/dsh-trpg/engine/inventory.js",
+      "bytes": 6167,
+      "sha256": "61167a75c854b97263ed58c87ec6c2778df5eda88d265cd05ee83ad6b5c282a1"
+    },
+    {
+      "path": "code/dsh-trpg/engine/journal.js",
+      "bytes": 9690,
+      "sha256": "aa1822cb9438ed8586fa1d8ccc412bf2a9155e8cad28b2ec6e493d29a3c4422a"
+    },
+    {
+      "path": "code/dsh-trpg/engine/lore.js",
+      "bytes": 1258,
+      "sha256": "614eefd6a693aaca7a4452e5a9b112fdd7debabfd5d3a5e415aa3e810457ed6c"
+    },
+    {
+      "path": "code/dsh-trpg/engine/opening.js",
+      "bytes": 6198,
+      "sha256": "03202e8c15cff6c0726f9c19ef2ecccc566693dc15e5090b400f9013ba231f7a"
+    },
+    {
+      "path": "code/dsh-trpg/engine/participation.js",
+      "bytes": 1128,
+      "sha256": "0184e511c655892ad830c46a82bb52bd6b38af9313af7983df941e63e50f0a7e"
+    },
+    {
+      "path": "code/dsh-trpg/engine/rng.js",
+      "bytes": 2208,
+      "sha256": "19570d57bae92602d827626943169aeb9757f051774c87a70d25aa8df53a7e17"
+    },
+    {
+      "path": "code/dsh-trpg/engine/rules.js",
+      "bytes": 13604,
+      "sha256": "08cea58974bd9968f9911e8caadecc5b0251997e222eb59783d00e46e436cbc5"
+    },
+    {
+      "path": "code/dsh-trpg/engine/runtime.js",
+      "bytes": 45061,
+      "sha256": "f8c99f1672df4f8e8f39513edf3e0c79d3bef7b49a8b5406b450e85236c39047"
+    },
+    {
+      "path": "code/dsh-trpg/engine/scene.js",
+      "bytes": 7690,
+      "sha256": "ba40f5130123339a6d9b3f579dbdb2c5d6167ae54206f22e5dbe703dc355eec0"
+    },
+    {
+      "path": "code/dsh-trpg/engine/settlement.js",
+      "bytes": 2555,
+      "sha256": "8c0b5fd3d75d42da894ee4bd24e04834ebe27f9a362e65f433fab4aa72cff3d9"
+    },
+    {
+      "path": "code/dsh-trpg/engine/stats.js",
+      "bytes": 3173,
+      "sha256": "fa1aa18ccd9cdde8fd43bc0a08247c0735166d7e70d079ea1c0477c6c386c1d2"
+    },
+    {
+      "path": "code/dsh-trpg/engine/store.js",
+      "bytes": 167,
+      "sha256": "8d323bcfc9885776b13be0e96ef3357f0770effe8dd528ded46f13d12606b686"
+    },
+    {
+      "path": "code/dsh-trpg/engine/threads.js",
+      "bytes": 5455,
+      "sha256": "9844134c846e45c089099da8a4a9afe5d370aa70b813b1d2bab19f777496062f"
+    },
+    {
+      "path": "code/dsh-trpg/lib/client.js",
+      "bytes": 29377,
+      "sha256": "69c20fad22773cff59e83de0b309feff2f3c7d983b45321c68009dad1e10b844"
+    },
+    {
+      "path": "code/dsh-trpg/lib/index.js",
+      "bytes": 2159,
+      "sha256": "5db885cc18eb519eecacb19081468f4a39b70fee3baea8e69023056a11a1dd9f"
+    },
+    {
+      "path": "code/dsh-trpg/lib/player-check.js",
+      "bytes": 4823,
+      "sha256": "df3cc1a4d68547a21aed06d61b6f72003bcbfa9a7ec7b34a179a15515d233736"
+    },
+    {
+      "path": "code/dsh-trpg/lib/tools.js",
+      "bytes": 12173,
+      "sha256": "b4b803e18013e12aee9a558cce6fe974ced3bae85597feccef3a1acd9c0e952f"
+    },
+    {
+      "path": "code/dsh-trpg/data/lore.json",
+      "bytes": 6522,
+      "sha256": "3005136287ebb3f61da248b80b094e2411c1667e7ab90581f4443cea0a6eb606"
+    },
+    {
+      "path": "code/dsh-trpg/server/app.js",
+      "bytes": 3246,
+      "sha256": "54aefdc3370c13d1bc1feed20008b282983c8130e2fd0c731cec58106dd2d837"
+    },
+    {
+      "path": "code/dsh-trpg/server/index.js",
+      "bytes": 1097,
+      "sha256": "4e7ee388a19a6a1b4a699e2909c4016917d27cf357bdd573ee58430408563a51"
+    },
+    {
+      "path": "code/dsh-trpg/web/app.js",
+      "bytes": 13773,
+      "sha256": "ce4648574e0958117b3eab45562fc515119f848909752d8e26fb90afdffb94e9"
+    },
+    {
+      "path": "code/dsh-trpg/web/index.html",
+      "bytes": 5719,
+      "sha256": "271a680ca806631446f17412c5e019e9c5e4236bc1081a84021abe822e466f5d"
+    },
+    {
+      "path": "code/dsh-trpg/web/style.css",
+      "bytes": 2840,
+      "sha256": "88d4e0fc6c45b4a1fed6d0f5fbcf931cd5be0579dbdcab40fabe2b55639fe42c"
+    },
+    {
+      "path": "code/dsh-trpg/scripts/check-dsh-instance.mjs",
+      "bytes": 955,
+      "sha256": "de5127198c2eaad4d2f19dcfa800510ab15f0b224774bdc11465a1edc444aa96"
+    },
+    {
+      "path": "code/dsh-trpg/scripts/check-dsh.mjs",
+      "bytes": 2965,
+      "sha256": "6e5a2187af01e762504c80dd96abe1aae25b492e3c1b1f8307fee4dc517f0f5f"
+    },
+    {
+      "path": "code/dsh-trpg/scripts/doctor.mjs",
+      "bytes": 1693,
+      "sha256": "986a2060db5bcd1388a6f0a69976f44f532b697686123e0859fa4b04c8da1976"
+    },
+    {
+      "path": "code/dsh-trpg/scripts/release.mjs",
+      "bytes": 2304,
+      "sha256": "7ebc4592bb200186bd2678af0389d0808359a0dc9e82bd1d4f41ddc5de192f20"
+    },
+    {
+      "path": "code/dsh-trpg/scripts/test.mjs",
+      "bytes": 531,
+      "sha256": "76f413da06ad039040c994d69e1a4d6265dfca53aacafcee07224133abff8d18"
+    },
+    {
+      "path": "code/dsh-trpg/bin/trpg.mjs",
+      "bytes": 695,
+      "sha256": "28b30a19b42b9edc3dee7f3e7e88543a63fe27cf676aeb99d4ef6bbbf87d4124"
+    },
+    {
+      "path": "code/dsh-trpg/prompt/gm-system.md",
+      "bytes": 80483,
+      "sha256": "c2ba0bc4a7375b5a563a471c1508aa5e50323e3f8d9d1e18a56b634f31ab0578"
+    },
+    {
+      "path": "code/dsh-trpg/prompt/mainline-rules.md",
+      "bytes": 43759,
+      "sha256": "27e7aa03cb0907fc01bab359ff4046edee81e82640153c732cbcc7813f32bc9f"
+    },
+    {
+      "path": "code/dsh-trpg/test/apply-hp.test.js",
+      "bytes": 5670,
+      "sha256": "213a18925cd3d1efc46dbcb1cb5f778b2b5d6e85ffdcc2ad6a2b3c8e84cbfa56"
+    },
+    {
+      "path": "code/dsh-trpg/test/checkpoints.test.js",
+      "bytes": 4400,
+      "sha256": "6d5de1fe6dcac721d97f990ea2b7803fdd3b35731cf4397354fcd60e90e096a6"
+    },
+    {
+      "path": "code/dsh-trpg/test/consistency.test.js",
+      "bytes": 14595,
+      "sha256": "ab94aa9348f7370b5f19f7a32f22910c3533889e478c3438f0f6e24037985f44"
+    },
+    {
+      "path": "code/dsh-trpg/test/dice.test.js",
+      "bytes": 5195,
+      "sha256": "a853fa69e93a2d7ec6b21fe7425e8546573dac75da17ff37c60e9035b2967566"
+    },
+    {
+      "path": "code/dsh-trpg/test/enemies.test.js",
+      "bytes": 4332,
+      "sha256": "c130f9a95afed561302ba83bbbb39f6bed86cee0cd0b20315562e7fe1b2901fd"
+    },
+    {
+      "path": "code/dsh-trpg/test/engine.test.js",
+      "bytes": 15564,
+      "sha256": "0ca651027d360d53680b24274cac05569526f61b39ed41fa9003da6e79d1b515"
+    },
+    {
+      "path": "code/dsh-trpg/test/facts.test.js",
+      "bytes": 6801,
+      "sha256": "1afc9ffeb0747ddc6e525d497f3e36c70d89ca2cc6da75d49818c7a9f2d1310e"
+    },
+    {
+      "path": "code/dsh-trpg/test/items.test.js",
+      "bytes": 2216,
+      "sha256": "af9ba0018fdd276d62f689608ab67c18cc0cee8c129313e02e281d5ffb77bf0c"
+    },
+    {
+      "path": "code/dsh-trpg/test/known-fixes.test.js",
+      "bytes": 10496,
+      "sha256": "10504d128f4ec8eecc6a62b32267401a63fdcfcce1c5b53e3d6834db183d5fad"
+    },
+    {
+      "path": "code/dsh-trpg/test/mainline.test.js",
+      "bytes": 3822,
+      "sha256": "efa2459d8100c33d00a37d6fde1b6144e69e44ec24c976c59994f5629da244e7"
+    },
+    {
+      "path": "code/dsh-trpg/test/opening-station.test.js",
+      "bytes": 3265,
+      "sha256": "5bc092e99a83d0bb813c41e1b3e72821a8307ee77d9a6daffe5f82f2811af3b3"
+    },
+    {
+      "path": "code/dsh-trpg/test/participation.test.js",
+      "bytes": 7512,
+      "sha256": "2cfed26d3e912bcb749a3e6f28ea0dc6c1cb8cf16dd6e2df724441b8c1224c5f"
+    },
+    {
+      "path": "code/dsh-trpg/test/player-check.test.js",
+      "bytes": 10134,
+      "sha256": "c0f5b8323048aa6a9c81c04ed0b64485e4d1d0da71b9d80ed8a75c3a3707b90a"
+    },
+    {
+      "path": "code/dsh-trpg/test/runtime.test.js",
+      "bytes": 28696,
+      "sha256": "942518d2df5896a2505cb3961aee295d5aa8d7db1bbdddcf80962c454169f68e"
+    },
+    {
+      "path": "code/dsh-trpg/test/server.test.js",
+      "bytes": 3187,
+      "sha256": "dd66f759e7b3be2278f463dad5838e311063a13b5a47bb5760a25545f19fe41c"
+    },
+    {
+      "path": "code/dsh-trpg/test/tags-runtime.test.js",
+      "bytes": 4989,
+      "sha256": "fd8031e4b06dae19d0844393d0937ae33d25d9759eea0342230f4384f41dc447"
+    },
+    {
+      "path": "code/dsh-trpg/test/thread-gate.test.js",
+      "bytes": 10748,
+      "sha256": "df92ba00ead0f20278ed3cc907f1dea96e2eddd4403af4521b6c8f1c1ae787f7"
+    },
+    {
+      "path": "code/dsh-trpg/test/version.test.js",
+      "bytes": 722,
+      "sha256": "5ab948b3148a2cfa669ee2502f253111673ebc5e532d6020ae40f2ac6e6cef0a"
+    },
+    {
+      "path": "code/dsh-trpg/package.json",
+      "bytes": 1252,
+      "sha256": "1f2050babdaea1848b0860cf1f11d150dc9f9b000acddfac993f0a6448acea5b"
+    },
+    {
+      "path": "code/dsh-trpg/cordis.patch.yml",
+      "bytes": 635,
+      "sha256": "267a49712eb9ca93ee6afc84c90f73e863ae8f586463da93364a66dbe29afc99"
+    },
+    {
+      "path": "code/dsh-trpg/README.md",
+      "bytes": 10941,
+      "sha256": "2ef4c9e456a51051767e3ef9527d2b441f865ec1ba7d7311d0671f1e08a9ed37"
+    },
+    {
+      "path": "code/dsh-trpg/DESIGN.md",
+      "bytes": 2641,
+      "sha256": "a9b01278de4dcede96a5331ad85f6571f4a81ab1509fb8ff68232d7eb5508e08"
+    },
+    {
+      "path": "center_setting/center_setting.md",
+      "bytes": 12108,
+      "sha256": "51d6e9a98b5385a315e4b815496a4a60f7073d3aeb20f4f71cbda2ef8599f610"
+    },
+    {
+      "path": "character_setting/daoqi.md",
+      "bytes": 42655,
+      "sha256": "2bfe1e28a6ab7a3be9a3d4b2e6c8f15521a214e270d8e146eadaa880dfcb8700"
+    },
+    {
+      "path": "character_setting/fengdan.md",
+      "bytes": 38086,
+      "sha256": "17931ad1ee18044c6fe6ce6f05d139014d8b1fac8ed9179d7a746987a1caa4f8"
+    },
+    {
+      "path": "character_setting/liyue.md",
+      "bytes": 52691,
+      "sha256": "ec6fefbcdf006cba4821740dde9115a11044b082ec1ef1bc8b6696572430c7e9"
+    },
+    {
+      "path": "character_setting/mengde.md",
+      "bytes": 47195,
+      "sha256": "5a70f1e59de6813ab70210af5e933b8267c4e05de24353bc4afe3a8fb309b209"
+    },
+    {
+      "path": "character_setting/nata.md",
+      "bytes": 42403,
+      "sha256": "b53d3fa4fb894d9ff6cc04ee89d9b282d9cdca279bee9d6e825ae5aeb261a1ac"
+    },
+    {
+      "path": "character_setting/npc.json",
+      "bytes": 640,
+      "sha256": "0bc54467885ed544f8e1d3e1eadeec6255cacbfecf02c5d4c629daa18862f11d"
+    },
+    {
+      "path": "character_setting/nuodekalai.md",
+      "bytes": 50425,
+      "sha256": "9c8db05398359970adcf0129dce31956037ec3e5a8b4cedf1e4353265c33a8fc"
+    },
+    {
+      "path": "character_setting/shijie.md",
+      "bytes": 32960,
+      "sha256": "21384f3aeba1dc7ea4de03fb25a409351a37f00e81f932812db66c840caebae3"
+    },
+    {
+      "path": "character_setting/xumi.md",
+      "bytes": 46380,
+      "sha256": "b7ed4e0babaa2908daea7aa8dc02235411b1fabee7a22c2bc2f75c1782dc47cc"
+    },
+    {
+      "path": "character_setting/zhidong.md",
+      "bytes": 73628,
+      "sha256": "c0a9f2d7d344284cee318407ba553dd2b29ce90455ab4b3748c1445ee668aca7"
+    },
+    {
+      "path": "world_setting/item_setting.md",
+      "bytes": 12050,
+      "sha256": "a6e3d7d4357c88b5be93a7d34f608ac04bb2d3707466901ac1005665b0a73fd1"
+    },
+    {
+      "path": "world_setting/weapon_setting.md",
+      "bytes": 12930,
+      "sha256": "14b0b6d277c28d9175a3630076fdd8f406ad044f6a0d0227e3c4c16a68628ff8"
+    },
+    {
+      "path": "world_setting/world_setting.md",
+      "bytes": 31389,
+      "sha256": "85a68e3948cd1421af0f155740100976d8c4bcb7a63ad124a569490575b9f674"
+    },
+    {
+      "path": "light_rule/attribute.md",
+      "bytes": 1128,
+      "sha256": "9343f4c0da0a7788ad98a8cd73de10ed7d01cda7d8c4e552a8b269df875bd163"
+    },
+    {
+      "path": "light_rule/elemental_reaction.md",
+      "bytes": 951,
+      "sha256": "bbe199958f87ba0dc89bfb136240ca20a4401586e7f764e9cf94342f0b5401be"
+    },
+    {
+      "path": "light_rule/enemy_setting.md",
+      "bytes": 12573,
+      "sha256": "b5b4d6c5bcd3ce1b09bfa9889ae0d6065ae39422c0ca1acec584ffe2325e3e1c"
+    },
+    {
+      "path": "light_rule/team_setting.md",
+      "bytes": 8943,
+      "sha256": "093d861392187e3faa0ecf5584942600422ee4603d4cb1b9b9f9f4cf292400e8"
+    },
+    {
+      "path": "user/player.json",
+      "bytes": 642,
+      "sha256": "afb8443e184444b1ae5c59ece6ccfcfcdea6d8b8b54302a11226f2011f13fa3e"
+    },
+    {
+      "path": "user/user.md",
+      "bytes": 338,
+      "sha256": "a97a50d0dca3a0457559b7f2cff9eac4f5e3c6ced54bb8245904f3954856f75f"
+    },
+    {
+      "path": "docs/assets/圆形小地图预览.png",
+      "bytes": 141359,
+      "sha256": "f8856fe0739f9f0cc8b4c2ace8ad2633dd8b079603a4164d70dab07852450912"
+    },
+    {
+      "path": "docs/assets/攻击骰子预览.png",
+      "bytes": 79345,
+      "sha256": "b70a1dbd2d7bb7f1a9988d62669858af0b1e3427e840f227ad0c2bfed7a812a3"
+    },
+    {
+      "path": "docs/assets/骰子卡片预览.png",
+      "bytes": 82325,
+      "sha256": "c19057b5b67368b08c8e77ac68b207bfbcd535f95843876b5f3b8ba6dabfd355"
+    },
+    {
+      "path": "docs/README.md",
+      "bytes": 4528,
+      "sha256": "67f530f3861cc425b3199c9e80e279a07687c0b3d5a8bdcc73e03ca723262e68"
+    },
+    {
+      "path": "docs/主持/主持手册.md",
+      "bytes": 50827,
+      "sha256": "740cf3c7c262a924ba63ca0fab64e687e4e09c23f51489a287173311aea3f9e0"
+    },
+    {
+      "path": "docs/使用/版本说明-v0.01.md",
+      "bytes": 2581,
+      "sha256": "fcb8333060b6f7a39124e9e0ba5beb485d2b373f00c91f05974b48cc92d538f9"
+    },
+    {
+      "path": "docs/使用/版本说明-v0.02.md",
+      "bytes": 1709,
+      "sha256": "84ed9c55dec4cfcd0cc36aa7bc1306e5c1a10646e3206739d4400df3977ed5ab"
+    },
+    {
+      "path": "docs/使用/玩家掷骰与动画说明.md",
+      "bytes": 4100,
+      "sha256": "9c63d746941a6d8a0e4e7575d182f4f2f5b4caee3757220e1fa12b7bade17206"
+    },
+    {
+      "path": "docs/历史设计/主线结构方案-v0.01.md",
+      "bytes": 719,
+      "sha256": "094d1f952912d5521d094a9f09052db35862112742bf74ca23452b527637bd40"
+    },
+    {
+      "path": "docs/历史设计/多人模式设计v0.3-双轮次.md",
+      "bytes": 14666,
+      "sha256": "a2a706558623082e910d2296a276675c29107463088c52ccb557aa7b21d2f968"
+    },
+    {
+      "path": "docs/历史设计/数值体系设计.md",
+      "bytes": 20618,
+      "sha256": "b25b326ce99af8e5b28796ea6e00b0f0091dc30ee82048500ee8a79280d5bc76"
+    },
+    {
+      "path": "docs/历史设计/数值结算v0.4-缩放与恢复.md",
+      "bytes": 13835,
+      "sha256": "333f5390e9ec89f07a87f0c9b249ab014fe4002b9d3ddd39ad3447292d8a3e90"
+    },
+    {
+      "path": "docs/历史设计/数值重构v0.2-量级上调.md",
+      "bytes": 15958,
+      "sha256": "7019475562c8f923b3e48b018b1da8577372089268e5ba9a6dda1a6124b2cae4"
+    },
+    {
+      "path": "docs/历史设计/武器与圣遗物体系设计.md",
+      "bytes": 13867,
+      "sha256": "5acc4b26956c0a768f8d7966c6bdda519543adf42dfc95fde1c79438eb1068e3"
+    },
+    {
+      "path": "docs/历史设计/群攻与单体攻击核算v0.5.md",
+      "bytes": 10888,
+      "sha256": "b00860b75cdd0ae032dec98bb4f2720f0b0d47759c3ec62436156ab51b85e57d"
+    },
+    {
+      "path": "docs/历史设计/追加裁定v1.2-时间轴与古名.md",
+      "bytes": 13295,
+      "sha256": "c7d09b20e98126e959e6fd1b5fa1260b216d83d2df5bade336973228ffe5c664"
+    },
+    {
+      "path": "docs/历史设计/追加裁定v1.3-古名与六英雄.md",
+      "bytes": 11087,
+      "sha256": "875983ce5b6029af6b7402f480a41ed792d10da3b60ba242d09d9a2e34ab0dbf"
+    },
+    {
+      "path": "docs/历史设计/追加裁定v1.4-收尾裁定.md",
+      "bytes": 13372,
+      "sha256": "26301e119c30d61e5908dcbfe485b84a3ad3ae0926dcc49cd691c5658f7c5501"
+    },
+    {
+      "path": "docs/历史设计/追加裁定v1.5-霜月之子与风花节.md",
+      "bytes": 11285,
+      "sha256": "988f288ddb672c6394c19c616cf46ed32e6ba9942abac1e2618a65a593b8173d"
+    },
+    {
+      "path": "docs/审查/A类矛盾裁定记录.md",
+      "bytes": 53305,
+      "sha256": "6a41616b945caf1697c3409c880cb2fbbc7cc56ba4b004070b7e7b48ff7bc53d"
+    },
+    {
+      "path": "docs/审查/古名核对与遗留项.md",
+      "bytes": 6131,
+      "sha256": "c80d902e4b1b44a60659d5a723221c471fd5fb8e8bd78696c7421f2ab6e17c2b"
+    },
+    {
+      "path": "docs/审查/机制修订说明-2026-10-15.md",
+      "bytes": 6206,
+      "sha256": "0fa34e49f6b9e4f3cb4c682236be2e3078cf148ccbfe2f3c16f72a5676020a52"
+    },
+    {
+      "path": "docs/审查/架构可行性审查-2026-10-15.md",
+      "bytes": 14268,
+      "sha256": "76d14d783d1bf6eec45707c70ca68a96acfff98ea3f5c9d1b02bd5bb7daf37f5"
+    },
+    {
+      "path": "docs/审查/设定集一致性审查.md",
+      "bytes": 35627,
+      "sha256": "4d629eb4793981c791b3dfba72b997f541fe00447a42c8c528492f2553e24fc1"
+    },
+    {
+      "path": "docs/测试/DSH实机试玩报告-2026-10-16.md",
+      "bytes": 8396,
+      "sha256": "02ea46e03f3b09e5f826aa857584451283ae6410ec224d4044fdf2a1eb115ed9"
+    },
+    {
+      "path": "docs/测试/不见旅行者主线测试-2026-10-16.md",
+      "bytes": 10106,
+      "sha256": "dcfcbdfeb922cc68eed028ec7292eb090aa57e08864251c43a8dcfdc3e8eb718"
+    },
+    {
+      "path": "docs/测试/主线沙盒长跨度测试-2026-10-16.md",
+      "bytes": 10592,
+      "sha256": "0437c0368bc2fbc96c91b7e57a977655bed92422f134c3a354decdd5792e7613"
+    },
+    {
+      "path": "docs/测试/叙事质量回归检查.md",
+      "bytes": 4681,
+      "sha256": "685649e519cafe7c6f9b1eeb5807027d19e2587f2693aacc95e65e780ff35bde"
+    },
+    {
+      "path": "docs/测试/实机回归-v0.02-2026-10-18.md",
+      "bytes": 2995,
+      "sha256": "0b2e554cf75d35776b3a1727df433f2de0a6ccccd167e2049c8c714c06b9b887"
+    },
+    {
+      "path": "docs/测试/新档战斗实测-2026-10-17.md",
+      "bytes": 13824,
+      "sha256": "43ede234e2f38e09fbd971ab9b472086debe8c790ba03daab9c8a3744d98497e"
+    },
+    {
+      "path": "docs/测试/新档非蒙德开局测试-2026-10-17.md",
+      "bytes": 8661,
+      "sha256": "7f39a775480e8eac14f9bdefa23a104818ca28989358168b22e465fc664f2394"
+    },
+    {
+      "path": "docs/测试/测试验收-v0.01.md",
+      "bytes": 2616,
+      "sha256": "5f2397538bb1512988a26b45da5379ca8ea8ad574ecb7c5c978aa083c6a1e7e4"
+    },
+    {
+      "path": "docs/测试/第一轮测试指南.md",
+      "bytes": 6414,
+      "sha256": "344593204ccad2c315cd76beeebe2ad6e89732cd0941b70f45bf52f7b58715e0"
+    },
+    {
+      "path": "docs/测试/第二轮测试验收清单.md",
+      "bytes": 13528,
+      "sha256": "caa443142774c453a8aaf15f34b6f50eed4d449834c033d375e929f3162662bb"
+    },
+    {
+      "path": "docs/测试/蒙德风龙危机实机测试-2026-10-17.md",
+      "bytes": 4278,
+      "sha256": "7a692bd47dc951cdc46eda9f242fdb87d7c5caada84899321ca502a70a443c04"
+    },
+    {
+      "path": "docs/测试/长对话续跑测试-2026-10-16.md",
+      "bytes": 6127,
+      "sha256": "5d11d16b34d375cb63a01d6239a8a6e4ad5b509ea1d89865e3fe01630a9302f8"
+    },
+    {
+      "path": "docs/规则/主线规则.md",
+      "bytes": 43759,
+      "sha256": "27e7aa03cb0907fc01bab359ff4046edee81e82640153c732cbcc7813f32bc9f"
+    },
+    {
+      "path": "docs/规则/同伴与高阶角色战斗介入机制.md",
+      "bytes": 13070,
+      "sha256": "9aa9b636ef2c9e75fc5e8dcfa379a22c3f5e58a12ac6cc8d5b0f6ffc335d03ad"
+    },
+    {
+      "path": "docs/规则/数值定稿v1.0.md",
+      "bytes": 30728,
+      "sha256": "b84185caa8318dde522d76f89f214ec9cf644b7e7320f6ab3dd22580c264c70c"
+    },
+    {
+      "path": "docs/规则/时间轴.md",
+      "bytes": 12161,
+      "sha256": "c547cc7772650602f824ad3c1322e09cf9619dd1c2dc6bce9ea6fcae4555de41"
+    },
+    {
+      "path": "docs/规则/格式规范.md",
+      "bytes": 12206,
+      "sha256": "0912be3f313e43660f78481fb23fb0abc8647e1a0ae30cc1fe5b00aa16333107"
+    },
+    {
+      "path": "docs/记录/改动记录-v0.01.md",
+      "bytes": 64379,
+      "sha256": "fbd613b99386f270cdee4146165154e38e0916353ce736e013d2661897171967"
+    },
+    {
+      "path": "docs/记录/改动记录-v0.02.md",
+      "bytes": 2101,
+      "sha256": "e36a9e57b0cd1db2bc3176ae104b2388e1c5065b868770957a42be75e84ff00c"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3579,
+      "sha256": "ccf273506bd0cff1e6cd1a709989f9b8df1f38edcea56a4b25c27de51ed0f372"
+    },
+    {
+      "path": "启动首轮测试.cmd",
+      "bytes": 231,
+      "sha256": "afc3fe59431c06080f8c02e4aa87809cab56fd7bcc38f455f2870ebb26791786"
+    },
+    {
+      "path": "启动AI跑团.cmd",
+      "bytes": 895,
+      "sha256": "ca447ef9f4f081f14421eafe398e573e91070fa73205762feb3064e12558dafe"
+    }
+  ]
+}

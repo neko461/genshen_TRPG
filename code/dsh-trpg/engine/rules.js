@@ -250,6 +250,16 @@ export const ENEMY_BASE_SOLO = Object.freeze({
   3: Object.freeze({ label: '首领', hpBase: 110, attacksPerRound: 2, aoeBase: 18, singleBase: 20, hitMod: 2 }),
 })
 
+/** 正减伤最多吸收本次减伤前伤害的80%；负减伤不受此上限影响。 */
+export const MAX_POSITIVE_REDUCTION_RATIO = 0.8
+export const INDEPENDENT_SOLO = Object.freeze({
+  hpFactor: 0.6,
+  hpFloors: Object.freeze({ 1: 20, 2: 30, 3: 5 }),
+  minimumSingleDamage: 12,
+  rounding: '仅HP向下取5的倍数并应用下限；群攻与单体不再乘0.6',
+  lockedAtStart: true,
+})
+
 /** 群攻的 n 系数（递增）。 */
 export const AOE_SCALE_PER_N = 0.10
 /** 随机单体的 n 系数（递减）。 */

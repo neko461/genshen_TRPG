@@ -38,6 +38,7 @@ export function syncTraveler(state) {
   const pc = Object.values(state.characters).find((a) => a.type === 'player')
   if (!pc) return
   const old = state.characters.traveler
+  if (!old && !state.party?.traveler?.met) return
   const stats = deriveStats(pc)
   const hp = Math.max(5, Math.floor(stats.hp * 0.8 / 5) * 5)
   const traveler = old ?? structuredClone(pc)

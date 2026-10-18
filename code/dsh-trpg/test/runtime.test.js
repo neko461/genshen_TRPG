@@ -20,14 +20,46 @@ function fixture(t, options = {}) {
   return { root, r, call, read }
 }
 function open(f) { f.call('trpg_scene', { op: 'open', goal: '找回货箱', location: '车道' }) }
+
+test('已发生跨日可记录且不治疗，休整加日后同日同步不重复恢复', t => {
+  const f = fixture(t)
+  f.call('trpg_apply', { actor: 'pc', hp: -20, reason: '受伤' })
+  const before = f.read()
+  assert.equal(before.characters.pc.state.hp, before.characters.pc.state.max_hp - 20)
+  f.call('trpg_state', { op: 'set', day: 3, reason: '已完成两日行程，补记日期' })
+  const after = f.read()
+  assert.equal(after.world.day, 3)
+  assert.deepEqual(after.characters, before.characters)
+  assert.equal(after.supplies, before.supplies)
+  assert.deepEqual(after.inventory, before.inventory)
+  f.call('trpg_recover', { level: '休整', reason: '安全住所休息一夜' })
+  const rested = f.read()
+  assert.equal(rested.world.day, 4)
+  f.call('trpg_state', { op: 'set', day: 4, reason: '核对休整后的同一日，不再增加' })
+  assert.deepEqual(f.read().characters, rested.characters)
+  assert.equal(f.read().world.day, 4)
+})
+
+test('日期倒退、非法日期及set未知字段失败且不提交部分状态', t => {
+  const f = fixture(t)
+  f.call('trpg_state', { op: 'set', day: 3, reason: '两日行程结束' })
+  for (const patch of [{ day: 2 }, { day: 0 }, { day: 3.5 }, { day: '4' }, { day: 100001 }, { daay: 4 }, { samples: ['粉末'] }, { day: 4, safe: 'yes' }]) {
+    const before = f.call('trpg_save', { op: 'load' })
+    assert.throws(() => f.call('trpg_state', { op: 'set', location: '不应落盘', ...patch, reason: '无效调用' }))
+    assert.deepEqual(f.call('trpg_save', { op: 'load' }), before)
+  }
+})
 test('正式开场无需存档，普通角色不默认获得元素，旅行者能力独立', (t) => {
   const f = fixture(t)
   const call = (tool, input) => f.r.execute({ mode: 'solo', slot: 'opening', tool, input })
   assert.match(call('trpg_char', { op: 'opening' }).opening, /还没有接受任何委托/)
   call('trpg_save', { op: 'new' })
-  const s = call('trpg_char', { op: 'create', id: 'pc', background: '蒙德的草药采集者' }).state
+  let s = call('trpg_char', { op: 'create', id: 'pc', background: '蒙德的草药采集者' }).state
   assert.equal(s.characters.pc.vision, false)
   assert.equal(s.characters.pc.element, null)
+  assert.equal(s.characters.traveler, undefined)
+  call('trpg_party', { op: 'traveler', action: 'meet', reason: '现场初识' })
+  s = call('trpg_party', { op: 'traveler', action: 'join', playerConfirmed: true, reason: '双方同意同行' }).state
   assert.equal(s.characters.traveler.element, '风')
   assert.equal(s.characters.traveler.power.type, 'traveler')
   call('trpg_scene', { op: 'open', goal: '试验战斗' })
@@ -247,6 +279,16 @@ test('四阶关系单步升级，背叛暂停支援；关系不提升剧透权�
   assert.throws(() => f.call('trpg_lore', { query: '钟离', spoilerMax: '隐藏' }))
 })
 
+test('party support允许已建立信任关系的新互动NPC，仍拒绝关系不足或同场重复登记', (t) => {
+  const f = fixture(t); open(f)
+  for (let i = 0; i < 2; i++) f.call('trpg_relation', { op: 'raise', actor: 'pc', npc: 'mona', sourceId: `mona_relation_${i}`, reason: '共同调查并互相帮助' })
+  const result = f.call('trpg_party', { op: 'support', actor: 'pc', npc: 'mona', name: '莫娜', reason: '她已在场，答应用占星结果协助判断敌人动向' })
+  assert.deepEqual(result.support, { id: 'mona', name: '莫娜', reason: '她已在场，答应用占星结果协助判断敌人动向' })
+  assert.throws(() => f.call('trpg_party', { op: 'support', actor: 'pc', npc: 'charlotte', name: '夏洛蒂', reason: '在场协助' }), /达到信任或羁绊/)
+  for (let i = 0; i < 2; i++) f.call('trpg_relation', { op: 'raise', actor: 'pc', npc: 'charlotte', sourceId: `charlotte_relation_${i}`, reason: '建立信任' })
+  assert.throws(() => f.call('trpg_party', { op: 'support', actor: 'pc', npc: 'charlotte', name: '夏洛蒂', reason: '想更换支援者' }), /每场只能一名 NPC 支援/)
+})
+
 test('剧情索引逐阶段解锁，禁止内容/任意路径/未来站点不返回正文', (t) => {
   const f = fixture(t)
   for (const query of ['哥伦比娅', '水龙王', '钟离', '世界树真相']) assert.deepEqual(f.call('trpg_lore', { query }).hits, [])
@@ -353,6 +395,7 @@ test('旧请求重试返回原动作结果与最新状态，不倒退页面版�
 test('快照写入失败仍从已提交日志恢复，不谎报动作失败', (t) => {
   const f = fixture(t)
   const projection = path.join(f.root, 'save/slots/solo/case', `state.${process.pid}.tmp`)
+  if (fs.existsSync(projection)) fs.unlinkSync(projection)
   fs.mkdirSync(projection)
   const result = f.call('trpg_narrate', { text: '快照失败时的有效事件' })
   assert(result.warning)

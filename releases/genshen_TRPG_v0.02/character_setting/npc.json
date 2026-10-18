@@ -1,0 +1,38 @@
+{
+  "schema_version": "0.01-template",
+  "type": "npc",
+  "name": "",
+  "region": "",
+  "element": null,
+  "weapon": "",
+  "spoiler_level": "公开",
+  "public": {
+    "identity": "",
+    "personality": [],
+    "speech_style": "",
+    "public_info": [],
+    "relationships": []
+  },
+  "gm_only": {
+    "true_identity": "",
+    "secrets": [],
+    "goals": [],
+    "abilities": [],
+    "gm_notes": [],
+    "plot_hooks": []
+  },
+  "attributes": {
+    "体魄": 0,
+    "灵巧": 0,
+    "心智": 0,
+    "感知": 0,
+    "交涉": 0,
+    "意志": 0
+  },
+  "state": {
+    "hp": 120,
+    "max_hp": 120,
+    "status": []
+  },
+  "template": true
+}

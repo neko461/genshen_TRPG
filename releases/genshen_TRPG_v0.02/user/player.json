@@ -1,0 +1,40 @@
+{
+  "schema_version": "0.01-template",
+  "type": "player",
+  "name": "",
+  "title": "",
+  "region": "",
+  "element": null,
+  "weapon": "",
+  "vision": false,
+  "attributes": {
+    "体魄": 0,
+    "灵巧": 0,
+    "心智": 0,
+    "感知": 0,
+    "交涉": 0,
+    "意志": 0
+  },
+  "state": {
+    "hp": 120,
+    "max_hp": 120,
+    "elemental_energy": 3,
+    "max_elemental_energy": 3,
+    "status": [],
+    "temporary_tags": []
+  },
+  "tags": [
+    {
+      "name": "",
+      "modifier": 1,
+      "note": ""
+    }
+  ],
+  "goal": "",
+  "bond": "",
+  "secret": "",
+  "equipment": [],
+  "background": "",
+  "gm_hooks": [],
+  "template": true
+}

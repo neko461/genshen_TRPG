@@ -1,0 +1,60 @@
+{
+  "name": "dsh-trpg",
+  "version": "0.0.2",
+  "description": "genshen_TRPG_v0.02：本地跑团与 DSH AI GM 工具，共用持久化规则运行时",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "trpg",
+    "dice",
+    "genshin"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "engine",
+    "data",
+    "web",
+    "server",
+    "scripts",
+    "bin",
+    "prompt",
+    "cordis.patch.yml",
+    "README.md",
+    "DESIGN.md"
+  ],
+  "scripts": {
+    "test": "node scripts/test.mjs",
+    "start": "node server/index.js",
+    "doctor": "node scripts/doctor.mjs",
+    "dsh:check": "node scripts/check-dsh.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-tool",
+        "@deepseek-ai/dsh-api-session-controller",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  }
+}

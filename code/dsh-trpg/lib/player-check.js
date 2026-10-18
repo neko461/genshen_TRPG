@@ -1,4 +1,4 @@
-import { Runtime } from '../engine/runtime.js'
+import { Runtime, normalizeToolInput } from '../engine/runtime.js'
 import { Journal, safeId } from '../engine/journal.js'
 import { playerAction } from '../engine/battle.js'
 
@@ -11,6 +11,7 @@ export function parsePlayerDice(text) {
 }
 
 export async function playerCheck(runtime, args, exec, askPlayer, options, tool = 'trpg_check') {
+  args = { ...args, input: normalizeToolInput(args.input) }
   if (!askPlayer) throw new Error('当前宿主没有玩家回答入口；本次未掷骰或执行检定')
   safeId(args.requestId, '玩家检定请求编号')
   const { waitForPlayer, ...input } = args.input
@@ -40,6 +41,7 @@ export async function playerCheck(runtime, args, exec, askPlayer, options, tool 
       input.tag ? `标签：${input.tag} ${signed(b.tag)}` : '不使用标签',
       `难度：${input.difficulty ?? '普通'} ${signed(b.difficulty)}；协助/处境 ${signed(b.circumstance)}；有效总修正 ${signed(Math.min(5, b.sum))}`,
       input.risk ? `可预见风险：${input.risk}` : '风险按GM刚才的公开说明；不在提交后临时追加条件。',
+      ...(input.retreatCost ? [`仅代价成功时额外支付：${input.retreatCost.reason}${input.retreatCost.quantity ? `（${input.retreatCost.quantity}份）` : ''}。完整成功不支付此项；撤退本身的任务取舍另算。`] : []),
       ...(combat ? ['提交后按真实战斗规则结算命中、伤害、资源与回合；取消不消耗行动。'] : []),
       '选择“掷骰”由引擎生成两个d6；也可在自定义回答中提交实体骰的两个骰面，例如 4,3。',
     ].join('\n\n')

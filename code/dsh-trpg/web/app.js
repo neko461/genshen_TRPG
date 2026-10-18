@@ -40,6 +40,13 @@ function bind(id, fn) {
     finally { busy = false; renderControls() }
   })
 }
+async function checkpointRequest(request) {
+  if (!config || !activeSlot) throw new Error('请先读取或开始一个存档')
+  const response = await fetch('/api/checkpoints', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-TRPG-Token': config.token }, body: JSON.stringify({ mode: 'solo', slot: activeSlot, ...request }) })
+  const data = await response.json()
+  if (!response.ok) throw new Error(data.error ?? '回溯点操作失败')
+  return data.result
+}
 function card(name, hp, max, detail) {
   const div = document.createElement('div'); div.className = 'card'
   const title = document.createElement('strong'); title.textContent = name; div.append(title)
@@ -52,6 +59,8 @@ function card(name, hp, max, detail) {
 function turn() { return state?.battle && !state.battle.over ? state.battle.order[state.battle.cursor] : null }
 function renderControls() {
   for (const button of document.querySelectorAll('button')) button.disabled = busy || !config
+  $('checkpoint-save').disabled = busy || !config || !state
+  $('checkpoint-read').disabled = busy || !config || !state
   if (!state) return
   const b = state.battle, t = turn(), fighting = b && !b.over
   for (const button of document.querySelectorAll('[data-action]')) button.disabled = busy || !fighting || t?.side !== 'party'
@@ -86,6 +95,39 @@ bind('switch-slot', async () => {
   $('slot').focus()
 })
 bind('refresh', () => call('trpg_save', { op: 'load' }))
+bind('checkpoint-save', async () => {
+  const saved = await checkpointRequest({ op: 'save', name: `第 ${state.revision} 笔事件 · ${state.world.location}` })
+  $('result').textContent = `已主动保存回溯点「${saved.checkpoint.name}」，存档修订 ${saved.checkpoint.revision}。`
+  notice('回溯点已保存。你可以继续推进；之后读取时会从此处创建新测试档。')
+})
+bind('checkpoint-read', async () => {
+  const { checkpoints } = await checkpointRequest({ op: 'list' })
+  const select = $('checkpoint-list')
+  select.replaceChildren(...checkpoints.slice().reverse().map((cp) => {
+    const option = document.createElement('option'); option.value = cp.id
+    option.textContent = `${cp.name} · 修订 ${cp.revision} · ${new Date(cp.savedAt).toLocaleString('zh-CN')}`
+    return option
+  }))
+  if (!checkpoints.length) throw new Error('当前存档还没有回溯点；先点“主动保存”')
+  $('branch-slot').value = `branch_${Date.now().toString(36)}`
+  const updateDetail = () => {
+    const cp = checkpoints.find((item) => item.id === select.value)
+    $('checkpoint-detail').textContent = cp ? `来源：${cp.slot} · ${cp.name} · 修订 ${cp.revision}` : ''
+  }
+  select.onchange = updateDetail; updateDetail()
+  $('checkpoint-dialog').showModal()
+})
+bind('branch-checkpoint', async () => {
+  const targetSlot = $('branch-slot').value.trim()
+  if (!/^[a-zA-Z0-9_-]{1,48}$/.test(targetSlot)) throw new Error('新测试档名称须为 1–48 位字母、数字、下划线或短横线')
+  if (!window.confirm(`将所选回溯点读取为新测试档“${targetSlot}”？原存档和当前分支都会保留。`)) return
+  const result = await checkpointRequest({ op: 'branch', checkpointId: $('checkpoint-list').value, targetSlot })
+  state = result.state; activeSlot = state.slot; localStorage.setItem('trpg_test_slot', activeSlot)
+  $('checkpoint-dialog').close(); render()
+  $('result').textContent = `已从修订 ${result.source.revision} 创建新测试档“${activeSlot}”。原档保持不变，可从此处分支继续测试。`
+  notice(`已读取回溯点并切换到新测试档：${activeSlot}。`)
+})
+bind('cancel-checkpoint', () => $('checkpoint-dialog').close())
 bind('verify', () => call('trpg_save', { op: 'verify' }))
 bind('open', () => call('trpg_scene', { op: 'open', goal: '调查车辙并找回协会货箱', location: '蒙德城外·旧车道', safe: false }))
 bind('check', () => call('trpg_scene', { op: 'check', actor: 'pc', attribute: '灵巧', tag: '野外追踪', purpose: '追踪货车车辙与脚印', unlockFlag: 'road_clue' }))
@@ -98,7 +140,10 @@ for (const button of document.querySelectorAll('[data-action]')) {
     try {
       const t = turn(); if (t?.side !== 'party') throw new Error('尚未轮到我方行动')
       const action = button.dataset.action
-      await call('trpg_combat', { op: 'act', actor: t.id, action, target: action === 'heal' ? t.id : $('target').value, attribute: '灵巧' })
+      const retreatCost = action === 'retreat' ? (state.supplies > 0
+        ? { type: 'supplies', quantity: 1, reason: '仓促撤退遗落一份补给' }
+        : { type: 'position', reason: '放弃桥边观察位置，被迫退到外侧林道，无法继续监视货箱' }) : undefined
+      await call('trpg_combat', { op: 'act', actor: t.id, action, target: action === 'heal' ? t.id : $('target').value, attribute: '灵巧', ...(retreatCost ? { retreatCost } : {}) })
     } catch (e) { notice(`未执行：${e.message}`) } finally { busy = false; renderControls() }
   })
 }

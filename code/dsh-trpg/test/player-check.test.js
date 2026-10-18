@@ -115,6 +115,42 @@ function combatFixture(t, askPlayer, name = 'trpg_combat_attack') {
   return { ...f, tool, args }
 }
 
+test('有玩家UI时省略或显式false不能跳过提交，scene check兼容入口同样等待', async t => {
+  for (const name of ['trpg_check', 'trpg_scene']) {
+    let answer, asks = 0
+    const ask = () => { asks++; return new Promise(resolve => { answer = resolve }) }
+    const f = fixture(t, ask)
+    const tool = createTools({ root: f.root, askPlayer: ask }).find(tool => tool.name === name)
+    for (const wait of [undefined, false]) {
+      const before = f.read()
+      const pending = tool.execute({ ...f.args, input: { ...f.args.input, op: 'check', waitForPlayer: wait } }, {})
+      assert.deepEqual(f.read(), before)
+      assert.equal(typeof answer, 'function')
+      answer({ answers: [{ id: f.args.requestId, selected: ['暂不检定'] }] })
+      assert.equal((await pending).cancelled, true)
+      assert.deepEqual(f.read(), before)
+    }
+    assert.equal(asks, 2)
+  }
+})
+
+test('有玩家UI时战斗两个入口默认等待，防御无骰仍可直接执行', async t => {
+  for (const name of ['trpg_combat_attack', 'trpg_combat']) {
+    let answer, asks = 0
+    const f = combatFixture(t, () => { asks++; return new Promise(resolve => { answer = resolve }) }, name)
+    const before = f.read()
+    const pending = f.tool.execute({ ...f.args, input: { ...f.args.input, waitForPlayer: false } }, {})
+    assert.equal(asks, 1)
+    assert.deepEqual(f.read(), before)
+    answer({ answers: [{ id: f.args.requestId, selected: ['暂不检定'] }] })
+    assert.equal((await pending).cancelled, true)
+    assert.deepEqual(f.read(), before)
+    await f.tool.execute({ ...f.args, input: { ...f.args.input, action: 'defend', waitForPlayer: false } }, {})
+    assert.equal(asks, 1)
+    assert.equal(f.read().battle.acted.pc, 1)
+  }
+})
+
 test('战斗等待不改变HP/能量/回合，手动骰结算并幂等重试', async t => {
   let answer, asks = 0
   const f = combatFixture(t, request => { asks++; return new Promise(resolve => { answer = resolve }) })

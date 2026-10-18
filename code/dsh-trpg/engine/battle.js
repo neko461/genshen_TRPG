@@ -1,7 +1,9 @@
 import { startCombat, enemyAttackRoll, pickTarget, advanceRound } from './combat.js'
 import { resolveDamage, findReaction, REACTIONS } from './damage.js'
+import { DOT, INDEPENDENT_SOLO } from './rules.js'
 import { applyDelta } from './character.js'
 import { actorOf, activeScene, integer, requireValue as need, checkActor, living, heal, refreshAll } from './campaign.js'
+import { battleCharacters } from './participation.js'
 
 const success = (r) => !['failure', 'critical_failure'].includes(r.tier)
 export function battleOf(s) { need(s.battle && !s.battle.over, '没有正在进行的战斗'); return s.battle }
@@ -13,12 +15,13 @@ export function requireTurn(s, id) {
   const t = currentTurn(s)
   need(t?.side === 'party' && t.id === id, `当前行动者是 ${t?.id ?? '未知'}，不是 ${id}`)
   const actor = actorOf(s, id)
+  need(battleCharacters(s).some(a => a.id === id), '行动者不在本场战斗')
   need(actor.state.hp > 0 && !actor.state.status.includes('重伤'), '该角色无法行动')
   return actor
 }
 function finish(s, outcome) {
   s.battle.over = true; s.battle.outcome = outcome
-  for (const a of Object.values(s.characters)) {
+  for (const a of battleCharacters(s)) {
     if (a.derived?.two === '沉沦之心') heal(a, 15)
     a.state.status = a.state.status.filter((x) => !['冻结', '结晶护盾'].includes(x))
     a.crystal = false; a.assist = false; a.pendingSupport = false
@@ -58,12 +61,18 @@ export function openBattle(s, input) {
   const allowed = new Set(['id', 'name', 'template', 'element'])
   for (const e of input.enemies) need(Object.keys(e).every((k) => allowed.has(k)), '试玩版敌人只接收 id/name/template/element，不接受外传 HP 或等级')
   const b = startCombat({ partyN: pcs.length, soloMode: s.mode === 'solo', party, enemies: input.enemies, phases: input.phases ?? 1 })
+  b.independentSolo = s.mode === 'solo' && !party.some(a => a.id === 'traveler')
+  // 独行只缩HP；不能再把伤害同时压低到固定减伤以下。
+  if (b.independentSolo) for (const e of b.enemies) {
+    e.hp = e.max_hp = Math.max(INDEPENDENT_SOLO.hpFloors[e.threat], Math.floor(e.max_hp * INDEPENDENT_SOLO.hpFactor / 5) * 5)
+    if (e.single > 0) e.single = Math.max(INDEPENDENT_SOLO.minimumSingleDamage, e.single)
+  }
   const ids = new Set()
   for (const e of b.enemies) {
     need(!ids.has(e.id) && !s.characters[e.id], '敌人 id 重复或与角色冲突'); ids.add(e.id)
     e.effects = []; e.runtime = {}; e.reduction = e.mechanic === '护甲' ? 10 : 0
   }
-  Object.assign(b, { id: `B${++s.battleSerial}`, cursor: 0, tick: 1, acted: {}, supportUsed: false, used: {}, roundEvents: [], history: [] })
+  Object.assign(b, { id: `B${++s.battleSerial}`, rulesVersion: 2, cursor: 0, tick: 1, acted: {}, supportUsed: false, used: {}, roundEvents: [], history: [] })
   for (const a of living(s)) { a.stance = '攻击'; a.moved = false; a.guard = null; a.pendingSupport = false }
   scene.hadBattle = true
   s.world.safe = false
@@ -77,6 +86,11 @@ export function playerAction(s, input, rng) {
   need(actor.power?.status !== 'pending', '特殊能力角色尚待设定审核与玩家确认；拒绝行动')
   if (input.action === 'skill' || input.action === 'heal') need(actor.element, '角色没有已确认的元素能力，不能发动元素技或能量治疗')
   const b = s.battle
+  const allyOf = id => {
+    const ally = actorOf(s, id)
+    need(battleCharacters(s).some(a => a.id === ally.id), '目标不在本场战斗')
+    return ally
+  }
   const action = input.action ?? 'attack'
   actor.moved = input.move === true
   actor.stance = '攻击'
@@ -90,24 +104,43 @@ export function playerAction(s, input, rng) {
     need(actor.unlockedElements.includes(input.element), '尚未共鸣该元素')
     actor.element = input.element; result = { element: actor.element, note: '切换消耗整次行动' }
   } else if (action === 'assist') {
-    const ally = actorOf(s, input.target); need(ally.id !== actor.id && ally.state.hp > 0, '协助须选另一名可行动队友')
+    const ally = allyOf(input.target); need(ally.id !== actor.id && ally.state.hp > 0, '协助须选另一名可行动队友')
     need(!ally.assist, '该队友已有待用协助'); ally.assist = true; result = { target: ally.id, assistance: 1 }
   } else if (action === 'retreat') {
+    const cost = input.retreatCost
+    if (b.rulesVersion >= 2 || cost !== undefined) {
+      need(cost && typeof cost === 'object' && !Array.isArray(cost), '撤退须事前声明retreatCost：补给、物品或具体位置损失；完整成功不收额外代价')
+      need(['supplies', 'item', 'position'].includes(cost.type), '撤退代价type须为supplies/item/position')
+      need(typeof cost.reason === 'string' && cost.reason.trim().length > 0 && cost.reason.length <= 500, '撤退代价须说明与现场有关的具体后果')
+      if (cost.type === 'supplies') {
+        integer(cost.quantity, 1, 6, '撤退补给代价'); need(s.supplies >= cost.quantity, '不足以承担已声明的撤退补给代价')
+      } else if (cost.type === 'item') {
+        integer(cost.quantity, 1, 1000, '撤退物品代价'); need(s.inventory[cost.item]?.quantity >= cost.quantity, '不足以承担已声明的撤退物品代价')
+      }
+    }
     const roll = checkActor(actor, input, rng.d6)
+    let paidCost = null
+    if (roll.tier === 'success_cost' && cost) {
+      if (cost.type === 'supplies') s.supplies -= cost.quantity
+      else if (cost.type === 'item') s.inventory[cost.item].quantity -= cost.quantity
+      else s.world.known_facts.push(`撤退后的位置损失：${cost.reason.trim()}`)
+      paidCost = structuredClone(cost)
+      b.retreatCost = paidCost
+    }
     if (success(roll)) finish(s, 'retreated')
-    result = { check: roll, note: success(roll) ? '队伍成功脱离' : '撤退失败，仍占一次行动；敌人按正常顺序行动' }
+    result = { check: roll, paidCost, note: success(roll) ? '队伍成功脱离；任务结果另按已发生事实结算' : '撤退失败，仍占一次行动；敌人按正常顺序行动' }
   } else if (action === 'heal') {
     need(!used('heal'), '每场战斗只能能量治疗一次')
     need(actor.state.elemental_energy >= 1, '元素能量不足')
-    const ally = actorOf(s, input.target ?? actor.id)
+    const ally = allyOf(input.target ?? actor.id)
     actor.state.elemental_energy--; mark('heal'); result = { healing: heal(ally, Math.floor(ally.state.max_hp * 0.2)) }
   } else if (action === 'transfer') {
     need(actor.derived.three === '流放者' && !used('transfer'), '需要流放者三件套且本战未使用')
-    const ally = actorOf(s, input.target); need(ally.id !== actor.id && ally.state.hp > 0, '须选择另一名队友')
+    const ally = allyOf(input.target); need(ally.id !== actor.id && ally.state.hp > 0, '须选择另一名队友')
     mark('transfer'); result = { transfer: applyDelta(ally, { energy: 1 }) }
   } else if (action === 'guard') {
     need(actor.derived.three === '悠古的磐岩' && !used('guard'), '需要悠古的磐岩三件套且本战未使用')
-    need(input.target !== actor.id && actorOf(s, input.target).state.hp > 0, '须保护另一名队友')
+    need(input.target !== actor.id && allyOf(input.target).state.hp > 0, '须保护另一名队友')
     actor.guard = input.target; mark('guard'); result = { guarded: input.target }
   } else {
     const target = b.enemies.find((e) => e.id === input.target)
@@ -207,11 +240,23 @@ export function enemyAction(s, rng) {
         if (target.derived.weapon.trait === '拒马' && !target.moved) reduction += 15
         const remembrance = `${target.id}:remembrance`
         if (target.derived.three === '追忆之注连' && !b.used[remembrance]) { reduction += 15; b.used[remembrance] = true }
-        let amount = Math.max(0, e[kind] - reduction)
-        applyDelta(target, { hp: -amount, ...(e.element ? { attachedElement: e.element } : {}) })
-        events.push({ kind, actor: e.id, target: target.id, selection, roll, damage: amount, hp: target.state.hp })
+        // 元素敌人与玩家侧对称：命中即按附着结算反应、加成与后续状态。
+        // 未命中（false）时 resolveDamage 直接返回 0 伤害且不消耗附着。
+        const attached = target.state.attached_element
+        const out = resolveDamage({ weaponDamage: e[kind] ?? 0, attackerElement: e.element, attachedElement: attached,
+          targetReduction: reduction, tier: roll.hit ? 'success' : 'failure' })
+        // 护盾只在护住时消耗，未命中的攻击不夺走它。
+        applyDelta(target, { hp: -out.final, ...(e.element ? { attachedElement: e.element } : {}) })
+        if (out.consumesAttached) target.state.attached_element = null
+        target.derived.reduction = Math.max(-30, target.derived.reduction + out.targetReductionDelta)
+        if (out.statuses.includes('冻结') && target.runtime.lastFrozen !== b.tick) { target.runtime.frozen = true; target.runtime.lastFrozen = b.tick }
+        if (out.reaction === '结晶') e.runtime.crystal = b.tick
+        if (out.dot && target.state.hp > 0) target.effects = [{ type: out.reaction, turns: DOT.defaultRounds, damage: DOT.damagePerRound }]
+        events.push({ kind, actor: e.id, target: target.id, selection, roll, damage: out.final, reaction: out.reaction,
+          reactionBonus: out.reactionBonus, reduction, statuses: out.statuses, attached: out.consumesAttached ? null : target.state.attached_element,
+          hp: target.state.hp })
         target.crystal = false
-      } else events.push({ kind, target: target.id, selection, roll, damage: 0 })
+      } else events.push({ kind, target: target.id, selection, roll, damage: 0, reaction: null })
     }
   }
   b.roundEvents.push({ actor: e.id, events })
@@ -231,7 +276,7 @@ export function nextRound(s) {
   if (result.over) finish(s, result.outcome)
   else {
     b.tick++; b.cursor = 0; b.acted = {}
-    for (const a of Object.values(s.characters)) { a.stance = '攻击'; a.moved = false }
+    for (const a of battleCharacters(s)) { a.stance = '攻击'; a.moved = false }
     skipInactive(s)
   }
   return result

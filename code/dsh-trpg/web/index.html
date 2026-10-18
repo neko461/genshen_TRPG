@@ -6,15 +6,23 @@
 <section id="welcome"><h2>开始你的旅程</h2><div class="fields"><label>冒险家姓名<input id="name" maxlength="40" value="初行者"></label><label>元素<select id="element"><option>水</option><option>火</option><option>冰</option><option>雷</option><option>草</option><option>风</option><option>岩</option></select></label><label>测试存档名<input id="slot" maxlength="48" value="first_test" pattern="[a-zA-Z0-9_-]+"></label></div><p class="muted">新建会获得一把单手剑、料理、药剂与两件用于测试装备和强化的生之花。已有同名存档不会被覆盖。</p><div class="actions"><button id="new" class="primary">新建测试档</button><button id="load">继续这个存档</button></div></section>
 <div id="notice" role="status">正在连接本地服务…</div>
 <div id="game" hidden>
-<section><div class="section-top"><h2 id="campaign">当前旅程</h2><div><button id="refresh">刷新读档</button><button id="verify">校验存档</button><button id="export">导出测试记录</button><button id="switch-slot">另开测试档</button></div></div><p id="world"></p><div id="characters" class="cards"></div></section>
+<section><div class="section-top"><h2 id="campaign">当前旅程</h2><div><button id="refresh">刷新读档</button><button id="checkpoint-save">主动保存</button><button id="checkpoint-read">读取存档（回溯点）</button><button id="verify">校验存档</button><button id="export">导出测试记录</button><button id="switch-slot">另开测试档</button></div></div><p id="world"></p><p class="muted">每次操作仍会自动保存。主动保存会建立可回溯检查点；读取时会从检查点创建一个新测试档分支，原档和后续记录都会保留。</p><div id="characters" class="cards"></div></section>
 <div class="columns"><div>
 <section><span class="eyebrow">01 / THE COMMISSION</span><h2>遗失的货箱</h2><p>凯瑟琳把一份委托推到柜台边：一辆运送协会物资的车迟迟没有抵达。车夫带着断掉的绳索回来，提到林间那座废弃瞭望台。</p><p>你可以调查车辙、追踪足迹，或先观察对方。失败会带来新的麻烦，委托不会因此永久停住。</p><p id="scene-state"></p><div class="actions"><button id="open">开始勘查</button><button id="check">调查足迹 · 灵巧</button><button id="lore">查看已知线索</button><button id="start-battle" class="primary">前往瞭望台 · 遭遇守卫</button></div><p id="clue" class="muted"></p></section>
-<section><span class="eyebrow">02 / COMBAT</span><h2>各自的行动</h2><p id="turn">尚未进入战斗</p><div id="enemies" class="cards"></div><label>行动目标<select id="target"></select></label><div class="actions"><button data-action="attack">普通攻击</button><button data-action="skill" class="primary">元素技 · 1 能量</button><button data-action="defend">防御</button><button data-action="interact">拆解机制</button><button data-action="heal">能量治疗 · 每战一次</button><button data-action="retreat">撤退</button><button id="enemy">执行敌人行动</button><button id="advance">结束本轮</button></div><p class="muted">按先攻轮流行动；旅行者也有自己的行动。对手行动与轮次需点击推进，方便你核对结算。超过上限会以局势转折收场。</p></section>
+<section><span class="eyebrow">02 / COMBAT</span><h2>各自的行动</h2><p id="turn">尚未进入战斗</p><div id="enemies" class="cards"></div><label>行动目标<select id="target"></select></label><div class="actions"><button data-action="attack">普通攻击</button><button data-action="skill" class="primary">元素技 · 1 能量</button><button data-action="defend">防御</button><button data-action="interact">拆解机制</button><button data-action="heal">能量治疗 · 每战一次</button><button data-action="retreat">撤退</button><button id="enemy">执行敌人行动</button><button id="advance">结束本轮</button></div><p class="muted">撤退代价成功：有补给时遗落1格，无补给则失去桥边监视位置；完整成功免此代价。按先攻轮流行动；旅行者也有自己的行动。对手行动与轮次需点击推进，方便你核对结算。超过上限会以局势转折收场。</p></section>
 </div><div>
 <section><span class="eyebrow">03 / SUPPLIES</span><h2>行囊与休息</h2><p id="supplies"></p><ul id="inventory"></ul><div class="actions"><button id="equip">装备生之花</button><button id="upgrade">强化生之花</button><button id="food">使用料理</button><button id="potion">当前角色使用药剂</button><button id="buy">补购料理 · 1 格</button><button id="close">结束场景</button><button id="return">沿路返回协会</button><button id="camp">扎营 · 1 格</button><button id="rest">安全休整</button><button id="reward">完成委托 · 领取一次报酬</button></div><p class="muted">料理与药剂共用每人每场景一次。重伤不会被休息自动清除。返回协会须结束战斗；领取报酬须真正找回货箱。</p></section>
 <section><h2>本次结算</h2><pre id="result">准备好后，新建或继续测试档。</pre><details><summary>查看完整工具结果（反馈时可复制）</summary><pre id="raw"></pre></details></section>
 <section><h2>记录你的感受</h2><label>反馈内容<textarea id="feedback" rows="4" placeholder="例如：战斗太快、某个按钮报错、希望怎样操作…"></textarea></label><button id="save-feedback">保存到本档</button><p class="muted">反馈仅保存在本机。测试结束后导出记录，带回聊天即可。</p></section>
 </div></div>
 </div>
+<dialog id="checkpoint-dialog">
+  <h2>读取回溯点</h2>
+  <p class="muted">选择一个检查点，系统会复制到新的测试档槽位，不覆盖原档。</p>
+  <label>回溯点<select id="checkpoint-list"></select></label>
+  <p id="checkpoint-detail" class="muted"></p>
+  <label>新测试档名称<input id="branch-slot" maxlength="48" pattern="[a-zA-Z0-9_-]+"></label>
+  <div class="actions"><button id="branch-checkpoint" class="primary">读取到新测试档</button><button id="cancel-checkpoint">取消</button></div>
+</dialog>
 </main><footer>同人跑团测试 · 设定版权归原权利人所有 · 本地存档，不上传数据</footer>
 </body></html>

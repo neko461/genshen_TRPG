@@ -32,11 +32,11 @@ export const TIER_LABEL = Object.freeze({
 
 /** 档位的叙事指引（GM 按此推进局势）。 */
 export const TIER_GUIDANCE = Object.freeze({
-  [TIER.CRITICAL_FAILURE]: '严重后果，但不直接死亡。推进局势，让代价落到具体的人或物上。',
-  [TIER.FAILURE]: '失败不是卡住，而是让故事转向。GM 推进局势。',
-  [TIER.SUCCESS_COST]: '成功，但有代价、麻烦、延迟或暴露。给出一个新选择。',
-  [TIER.SUCCESS]: '成功。给出新选择，而不是结束。',
-  [TIER.CRITICAL_SUCCESS]: '大成功，额外收益。',
+  [TIER.CRITICAL_FAILURE]: '严重后果，但不直接死亡；依据事前风险与当前行动结算，不临时追加无关损失。',
+  [TIER.FAILURE]: '本次目标未达成，按事前风险与既有因果落实后果；不原样重掷，不改成无关惩罚。',
+  [TIER.SUCCESS_COST]: '本次目标达成，落实事前可预见的代价；达到任务目标时正常收束，不用新疑点抵消成功。',
+  [TIER.SUCCESS]: '本次目标达成，兑现结果；若已解决当前任务就收束并交代回报与后果，不强加新选择或追加任务。',
+  [TIER.CRITICAL_SUCCESS]: '本次目标达成并获得合理额外收益；达到任务目标时正常收束。',
 })
 
 /** 失败的合计上限（含）。 */

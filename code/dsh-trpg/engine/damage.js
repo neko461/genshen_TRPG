@@ -14,6 +14,7 @@ import {
   REACTION_AMPLIFY_BONUS,
   REACTION_TRANSFORM_BONUS,
   DOT,
+  MAX_POSITIVE_REDUCTION_RATIO,
 } from './rules.js'
 
 /**
@@ -160,14 +161,17 @@ export function resolveDamage(input) {
   let tierBonus = 0
   if (input.tier === 'success_cost') {
     tierBonus = -Math.ceil(weapon / 2)
-    notes.push('成功带代价：伤害减半')
+    notes.push('成功带代价：武器基础伤害减半，其他加成与减伤另算')
   }
 
   // ---- 4. 结算 ----
   // 减伤是「先加上攻击带来的减伤变化 delta，再与基础减伤相抵」。
   // delta 为负（破防 −15 / 超导 −10）时，目标实际减伤下降。
   const subtotal = weapon + tierBonus + reactionBonus + traitBonus + bonusDamage
-  const reduction = Math.max(-30, targetReduction + targetReductionDelta)
+  const requestedReduction = Math.max(-30, targetReduction + targetReductionDelta)
+  // 双方对称：固定减伤不能把有伤害的命中永久归零；负减伤照常增伤。
+  const reduction = Math.min(requestedReduction, Math.floor(Math.max(0, subtotal) * MAX_POSITIVE_REDUCTION_RATIO))
+  if (reduction < requestedReduction) notes.push('正减伤封顶为本次减伤前伤害的80%（向下取整）')
   const final = Math.max(0, subtotal - reduction)
 
   return {
@@ -178,6 +182,7 @@ export function resolveDamage(input) {
     bonus: bonusDamage,
     subtotal,
     reduction,
+    requestedReduction,
     final,
     statuses,
     notes: notes.filter((n) => n !== ''),
