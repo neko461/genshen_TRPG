@@ -9,6 +9,9 @@ dist/
 /save/
 /user/
 /archive/
+/memory/
+/MEMORY.md
+/dsh-config-pre-migration.json
 /DSH配置迁移前-package.json
 .env
 .env.*

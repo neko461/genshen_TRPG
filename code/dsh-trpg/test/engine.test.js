@@ -1,7 +1,7 @@
 /**
  * 装备、伤害、战斗、剧情轮次测试。
  *
- * 验证 `数值定稿v1.0.md` §5–§8 的关键数值与结构。
+ * 验证 `finalized-stat-rules-v1.0.md` §5–§8 的关键数值与结构。
  */
 
 import { test } from 'node:test'
@@ -50,10 +50,10 @@ test('weaponStats：五类武器的四维与品质缩放', () => {
 
 test('artifactBonus：基础加成与品质无关，强化按 +25% 累计', () => {
   const a = makeArtifact({ set: '冒险家', slot: '生之花', quality: 5 })
-  assert.deepEqual(artifactBonus(a), { hp: 30 })
+  assert.deepEqual(artifactBonus(a), { hp: 10 })
   const b = makeArtifact({ set: '冒险家', slot: '生之花', quality: 5, upgrade: 4 })
-  // 30 × (1 + 4×0.25) = 60
-  assert.deepEqual(artifactBonus(b), { hp: 60 })
+  // 10 × (1 + 4×0.25) = 20
+  assert.deepEqual(artifactBonus(b), { hp: 20 })
 })
 
 test('artifactBonus：理之冠的加成由套装决定', () => {

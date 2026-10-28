@@ -1,0 +1,102 @@
+[
+  {
+    "id": "gm.hosting",
+    "source": "gm",
+    "heading": "genshin_trpg_v0.02 · AI GM 系统提示词"
+  },
+  {
+    "id": "gm.writing-full",
+    "source": "gm",
+    "heading": "跑团文本质量规范"
+  },
+  {
+    "id": "gm.geography",
+    "source": "gm",
+    "heading": "地理与地图规范"
+  },
+  {
+    "id": "gm.difficulty",
+    "source": "gm",
+    "heading": "难度与处境裁定规范"
+  },
+  {
+    "id": "gm.companions",
+    "source": "gm",
+    "heading": "旅行者同行与关系规范"
+  },
+  {
+    "id": "mainline.intro",
+    "source": "mainline",
+    "heading": "v0.01 主线规则：亲历核心危机"
+  },
+  {
+    "id": "mainline.causality",
+    "source": "mainline",
+    "heading": "世界事件的因果优先级"
+  },
+  {
+    "id": "mainline.direction",
+    "source": "mainline",
+    "heading": "一、战役方向与权威"
+  },
+  {
+    "id": "mainline.chapters",
+    "source": "mainline",
+    "heading": "二、章节骨架"
+  },
+  {
+    "id": "mainline.long-quests",
+    "source": "mainline",
+    "heading": "三、水仙十字与其他长支线"
+  },
+  {
+    "id": "mainline.play",
+    "source": "mainline",
+    "heading": "四、目标、自由行动与推进"
+  },
+  {
+    "id": "mainline.continuity",
+    "source": "mainline",
+    "heading": "五、阶段记录与知识隔离"
+  },
+  {
+    "id": "mainline.legacy",
+    "source": "mainline",
+    "heading": "六、当前存档的衔接"
+  },
+  {
+    "id": "mainline.length",
+    "source": "mainline",
+    "heading": "七、较长叙事"
+  },
+  {
+    "id": "mainline.dialogue",
+    "source": "mainline",
+    "heading": "八、自然对话"
+  },
+  {
+    "id": "mainline.writing",
+    "source": "mainline",
+    "heading": "九、文本质量"
+  },
+  {
+    "id": "mainline.geography",
+    "source": "mainline",
+    "heading": "十、地图与地理"
+  },
+  {
+    "id": "mainline.difficulty",
+    "source": "mainline",
+    "heading": "十一、难度裁定"
+  },
+  {
+    "id": "mainline.relationships",
+    "source": "mainline",
+    "heading": "十二、同行关系的温度与连续性"
+  },
+  {
+    "id": "mainline.growth",
+    "source": "mainline",
+    "heading": "十三、成长节点与可见效果"
+  }
+]

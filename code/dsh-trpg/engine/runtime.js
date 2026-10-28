@@ -3,10 +3,10 @@ import path from 'node:path'
 import { randomInt } from 'node:crypto'
 import { Journal, safeId } from './journal.js'
 import { createCharacter, applyDelta, recover, addTag, addExpertise, normalizeTags } from './character.js'
-import { BUILD_SCHEMES, ATTRIBUTES, RECOVERY, RELATION_TIERS, WEAPONS, INDEPENDENT_SOLO, MAX_POSITIVE_REDUCTION_RATIO } from './rules.js'
-import { listEnemies } from './enemies.js'
+import { BUILD_SCHEMES, ATTRIBUTES, RECOVERY, RELATION_TIERS, WEAPONS } from './rules.js'
+import { listEnemies, ENCOUNTER_LIMITS } from './enemies.js'
 import { ARTIFACT_SETS, listWeapons } from './gear.js'
-import { rollExpression, DIFFICULTY, CAPS } from './dice.js'
+import { rollExpression } from './dice.js'
 import { openScene, closeScene } from './scene.js'
 import { newState, publicState, consistencyWarnings, inferSceneOpenDay, narrateConsistency, normalizeApplyInput, requireSurvivableHeal, requireValue as need, nonempty, integer, actorOf, outsideBattle, activeScene, checkActor, refreshAll, heal, STATIONS } from './campaign.js'
 import { openBattle, playerAction, enemyAction, nextRound, currentTurn } from './battle.js'
@@ -17,8 +17,12 @@ import { openingFor, CREATION_GUIDE } from './opening.js'
 import { ensureParticipation, presentCharacters, sceneCharacters, travelerStatus } from './participation.js'
 import { threadGate, describeThreadGate, threadKindOf, inferThreadKind, isPending, THREAD_KINDS, THREAD_OUTCOMES } from './threads.js'
 import { branchCheckpoint, createCheckpoint, listCheckpoints } from './checkpoints.js'
+import { stateDelta } from './state-delta.js'
+import { readGuidance, stagedOpening } from './guidance.js'
+import { ruleReference } from './rule-reference.js'
+import { characterProfiles } from './character-profiles.js'
 
-export const VERSION = 'genshen_TRPG_v0.02'
+export const VERSION = 'genshin_trpg_v0.02'
 export const TOOL_NAMES = ['trpg_save', 'trpg_char', 'trpg_roll', 'trpg_check', 'trpg_apply', 'trpg_recover', 'trpg_scene', 'trpg_combat', 'trpg_combat_attack', 'trpg_combat_advance', 'trpg_item', 'trpg_gear', 'trpg_party', 'trpg_relation', 'trpg_state', 'trpg_narrate', 'trpg_recap', 'trpg_lore', 'trpg_rules']
 
 function object(x) { need(x && typeof x === 'object' && !Array.isArray(x), 'input 必须是对象'); return x }
@@ -73,11 +77,34 @@ function addCharacter(s, input) {
 }
 
 export class Runtime {
-  constructor({ root, d6Source, random } = {}) {
+  #journals = new Map()
+  constructor({ root, d6Source, random, journalCacheSize = 8, journalCacheBytes = 16 * 1024 * 1024 } = {}) {
     this.root = path.resolve(root ?? process.cwd())
     this.rng = { d6: d6Source, random: random ?? (() => randomInt(0, 0x100000000) / 0x100000000) }
+    this.journalCacheSize = integer(journalCacheSize, 0, 64, '存档缓存数量')
+    this.journalCacheBytes = integer(journalCacheBytes, 0, 256 * 1024 * 1024, '存档缓存字节')
   }
+  journal(mode, slot) {
+    safeId(slot, '槽位')
+    need(['solo', 'multi'].includes(mode), '须明确指定 mode: solo 或 multi')
+    const key = `${mode}/${slot}`
+    const journal = this.#journals.get(key) ?? new Journal(this.root, mode, slot)
+    journal.assertSafePath()
+    this.#journals.delete(key)
+    this.#journals.set(key, journal)
+    return journal
+  }
+  get journalCacheInfo() {
+    return { entries: this.#journals.size, bytes: [...this.#journals.values()].reduce((n, journal) => n + journal.cacheBytes, 0) }
+  }
+  clearJournalCache() { this.#journals.clear() }
   execute(request) {
+    try { return this.executeRequest(request) }
+    finally {
+      while (this.#journals.size && (this.#journals.size > this.journalCacheSize || this.journalCacheInfo.bytes > this.journalCacheBytes)) this.#journals.delete(this.#journals.keys().next().value)
+    }
+  }
+  executeRequest(request) {
     object(request)
     const { tool, mode, slot, requestId, expectedRevision } = request
     let { input } = request
@@ -87,7 +114,12 @@ export class Runtime {
       need(Number.isInteger(expectedRevision), '事实写入须先用facts读取清单，并将返回的revision作为expectedRevision传回，避免依据过期状态纠错')
     }
     if (tool === 'trpg_combat_attack') need((input.op === undefined || input.op === 'act') && !['enemy', 'advance', 'start'].includes(input.action), '攻击便捷工具仅执行我方动作；敌方回合请用trpg_combat input:{op:"enemy"}，推进用trpg_combat_advance')
-    const journal = new Journal(this.root, mode, slot)
+    const journal = this.journal(mode, slot)
+    if (tool === 'trpg_char' && ['search', 'profile'].includes(input.op)) {
+      const station = input.station ?? (fs.existsSync(journal.file) ? journal.load().timeline.index : 1)
+      need(Number.isInteger(station) && station >= 1 && station <= STATIONS.length, '角色资料station须为1–9')
+      return characterProfiles(input, station)
+    }
     if (tool === 'trpg_save' && input.op === 'checkpoint') {
       return { checkpoint: createCheckpoint(this.root, mode, slot, input.name, input.description) }
     }
@@ -99,39 +131,20 @@ export class Runtime {
       return branchCheckpoint(this.root, mode, slot, input.checkpointId, input.targetSlot)
     }
     if (tool === 'trpg_char' && input.op === 'guidance') {
-      if (input.topic === 'writing') {
-        const text = fs.readFileSync(new URL('../prompt/gm-system.md', import.meta.url), 'utf8')
-        const marker = '### 关键场景对话自检（后台执行）'
-        const start = text.indexOf(marker)
-        need(start >= 0, '关键场景对话自检章节缺失，请检查主持提示词')
-        const body = text.slice(start + marker.length).split(/\r?\n#{1,3} /, 1)[0].trim()
-        return { audience: 'GM', topic: input.topic,
-          sections: [{ heading: marker.slice(4), paragraphs: body.split(/\r?\n\s*\r?\n/) }] }
-      }
-      const topics = {
-        mainline: ['主线进程与章节沙盒（2026-10-16修订）'],
-        mondstadt: ['蒙德关键进程与原创调查的边界'],
-        continuity: ['事实、时间与交接一致性'],
-      }
-      need(Object.hasOwn(topics, input.topic), 'guidance topic 须为 mainline/mondstadt/continuity/writing')
-      const text = fs.readFileSync(new URL('../prompt/mainline-rules.md', import.meta.url), 'utf8')
-      const sections = topics[input.topic].map(heading => {
-        const marker = `### ${heading}`
-        const start = text.indexOf(marker)
-        need(start >= 0, '主持资料章节缺失，请检查发布镜像')
-        const body = text.slice(start + marker.length).split(/\r?\n#{1,3} /, 1)[0].trim()
-        return { heading, paragraphs: body.split(/\r?\n\s*\r?\n/) }
-      })
-      return { audience: 'GM', topic: input.topic, sections }
+      const station = input.station ?? (input.topic === 'chapter' ? journal.load().timeline.name : '蒙德')
+      need(STATIONS.includes(station), 'guidance station无效')
+      return readGuidance(input, { slot, station })
     }
     if (tool === 'trpg_char' && input.op === 'opening') {
       const station = input.startStation ?? '蒙德'
       need(STATIONS.includes(station), `开场站点无效；可选：${STATIONS.join('、')}`)
+      need(input.profile === undefined || ['full', 'staged'].includes(input.profile), 'profile须为full或staged')
+      if (input.profile === 'staged') return { opening: openingFor(station), startStation: station, creation: CREATION_GUIDE, ...stagedOpening(station, slot) }
       return { opening: openingFor(station), startStation: station, creation: CREATION_GUIDE,
         gmInstructions: fs.readFileSync(new URL('../prompt/gm-system.md', import.meta.url), 'utf8'),
         gmMainline: fs.readFileSync(new URL('../prompt/mainline-rules.md', import.meta.url), 'utf8') }
     }
-    if (tool === 'trpg_rules') return { version: VERSION, schemes: BUILD_SCHEMES, caps: CAPS, difficulty: DIFFICULTY, recovery: RECOVERY, enemies: listEnemies(), artifactSets: ARTIFACT_SETS, weapons: listWeapons(), independentSolo: INDEPENDENT_SOLO, maxPositiveReductionRatio: MAX_POSITIVE_REDUCTION_RATIO }
+    if (tool === 'trpg_rules') return ruleReference(input.scope, VERSION)
     if (tool === 'trpg_save' && input.op === 'list') {
       const result = {}
       for (const m of ['solo', 'multi']) {
@@ -151,7 +164,7 @@ export class Runtime {
         recentEvents: records.slice(-limit).map(({ id, at, command }) => ({ id, at, command })), integrity: journal.verifyRecords(records) }
     }
     if (tool === 'trpg_lore') return searchLore(journal.load(), input)
-    if (tool === 'trpg_combat' && input.op === 'roster') return { enemies: listEnemies(), budget: 4 }
+    if (tool === 'trpg_combat' && input.op === 'roster') return { enemies: listEnemies(), budget: ENCOUNTER_LIMITS.standard.budget, limits: ENCOUNTER_LIMITS, note: 'budget为通用上限；solo普通遭遇按实际参战人数使用independent或accompanied；单独首领成本4。' }
     if (tool === 'trpg_gear' && input.op === 'catalog') return { weapons: listWeapons(), sets: ARTIFACT_SETS }
     if (tool === 'trpg_item' && input.op === 'list') { const s = journal.load(); return { supplies: s.supplies, inventory: s.inventory } }
     if (tool === 'trpg_char' && input.op === 'list') return { characters: journal.load().characters }
@@ -178,7 +191,9 @@ export class Runtime {
     // 归一结果同时用于后续逻辑，保证记账与指纹看到的是同一份参数。
     if (tool === 'trpg_apply') input = normalizeApplyInput(input)
     const command = input
-    return journal.commit(tool, command, (old) => {
+    let before
+    const committed = journal.commit(tool, command, (old) => {
+      before = old ? structuredClone(publicState(old)) : null
       let s = create ? newState(mode, slot, input) : old
       ensureParticipation(s)
       let result
@@ -295,6 +310,8 @@ export class Runtime {
       if (warnings.length) result.warnings = warnings.filter((w, i) => warnings.findIndex(x => x.kind === w.kind && x.threadId === w.threadId && x.sceneId === w.sceneId) === i)
       return { state: s, result: { ...result, state: publicState(s) } }
     }, { create, requestId, expectedRevision })
+    // A replay may refer to an older action but contains the latest state: send a full resync.
+    return before && !committed.replayed ? { ...committed, delta: stateDelta(before, committed.state) } : committed
   }
   scene(s, input) {
     outsideBattle(s)

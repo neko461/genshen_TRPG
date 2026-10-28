@@ -37,13 +37,18 @@ export class Journal {
     this.dir = path.resolve(root, 'save', 'slots', mode, slot)
     const base = path.resolve(root, 'save', 'slots', mode)
     if (path.dirname(this.dir) !== base) throw new Error('存档路径越界')
-    let component = path.resolve(root)
-    for (const part of ['save', 'slots', mode, slot]) {
+    this.root = path.resolve(root)
+    this.assertSafePath()
+    this.file = path.join(this.dir, 'journal.jsonl')
+  }
+  assertSafePath() {
+    let component = this.root
+    for (const part of ['save', 'slots', this.mode, this.slot]) {
       component = path.join(component, part)
       if (fs.existsSync(component) && fs.lstatSync(component).isSymbolicLink()) throw new Error('存档目录不能使用符号链接或目录联接')
     }
-    this.file = path.join(this.dir, 'journal.jsonl')
   }
+  get cacheBytes() { return this.#cache?.size ?? 0 }
   /**
    * 校验一批日志行并接到既有校验链上。
    * `start` 为该批第一行的字节偏移，`seqBase` 为其之前已校验的事件数。
@@ -73,10 +78,11 @@ export class Journal {
    * 任何情况下都不跳过坏行。缓存只影响速度，不影响判定结果。
    */
   records() {
+    this.assertSafePath()
     if (!fs.existsSync(this.file)) { this.#cache = null; return [] }
     const stat = fs.statSync(this.file)
     const cache = this.#cache
-    if (cache && cache.size === stat.size && cache.mtimeMs === stat.mtimeMs) return cache.events
+    if (cache && cache.size === stat.size && cache.mtimeMs === stat.mtimeMs && cache.ctimeMs === stat.ctimeMs && cache.ino === stat.ino && cache.dev === stat.dev) return cache.events
     let next = null
     if (cache && stat.size > cache.offset) {
       const fd = fs.openSync(this.file, 'r')
@@ -102,7 +108,7 @@ export class Journal {
       const parsed = this.#parse(text, 0, 'genesis', 0)
       next = { offset: parsed.offset, previous: parsed.previous, events: parsed.events, raw }
     }
-    this.#cache = { size: stat.size, mtimeMs: stat.mtimeMs, ...next }
+    this.#cache = { size: stat.size, mtimeMs: stat.mtimeMs, ctimeMs: stat.ctimeMs, ino: stat.ino, dev: stat.dev, ...next }
     return next.events
   }
   /**
@@ -127,6 +133,7 @@ export class Journal {
     return structuredClone(all.at(-1).after)
   }
   commit(command, input, mutate, { create = false, requestId, expectedRevision } = {}) {
+    this.assertSafePath()
     fs.mkdirSync(this.dir, { recursive: true })
     const lock = path.join(this.dir, '.transaction.lock')
     let fd

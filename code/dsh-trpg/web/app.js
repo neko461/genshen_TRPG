@@ -162,7 +162,7 @@ bind('reward', async () => { if (state?.battle?.outcome !== 'victory') throw new
 bind('save-feedback', () => call('trpg_narrate', { text: `首测反馈：${$('feedback').value.trim() || '暂无补充'}` }))
 bind('export', async () => {
   const result = await call('trpg_save', { op: 'export', limit: 100 })
-  const blob = new Blob([JSON.stringify({ version: 'genshen_TRPG_v0.01', exportedAt: new Date().toISOString(), ...result }, null, 2)], { type: 'application/json' })
+  const blob = new Blob([JSON.stringify({ version: 'genshin_trpg_v0.01', exportedAt: new Date().toISOString(), ...result }, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `TRPG首测-${state.slot}.json`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
 })
 async function boot() {
@@ -170,7 +170,7 @@ async function boot() {
     config = await (await fetch('/api/config')).json()
     $('slot').value = localStorage.getItem('trpg_test_slot') || 'first_test'
     notice('已连接本机服务。新建测试档，或继续已有存档。')
-  } catch { notice('未连接服务，请先双击“启动首轮测试.cmd”。') }
+  } catch { notice('未连接服务，请先双击“launch-first-test.cmd”。') }
   renderControls()
 }
 boot()

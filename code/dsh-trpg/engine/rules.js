@@ -1,10 +1,10 @@
 /**
  * 规则常量表。
  *
- * **本文件是 `数值定稿v1.0.md` 在代码里的唯一落点。**
+ * **本文件是 `finalized-stat-rules-v1.0.md` 在代码里的唯一落点。**
  * 改数值只改这里；其他模块一律从本文件读取，不得内联魔法数字。
  *
- * 状态：v0.1 定稿——结构锁定，参数可调。调整时须遵守 数值定稿v1.0.md §11 的七条结构约束。
+ * 状态：v0.1 定稿——结构锁定，参数可调。调整时须遵守 finalized-stat-rules-v1.0.md §11 的七条结构约束。
  */
 
 /* ------------------------------------------------------------------ *
@@ -198,8 +198,10 @@ export function resolveWeapon(type, quality = 1) {
 export const ARTIFACT_SLOTS = Object.freeze(['生之花', '死之羽', '理之冠'])
 
 /** 各槽位的**固定**加成（与品质、套装无关）。 */
+export const ARTIFACT_HP_BONUS = 10
+
 export const ARTIFACT_SLOT_BASE = Object.freeze({
-  生之花: Object.freeze({ hp: 30 }),
+  生之花: Object.freeze({ hp: ARTIFACT_HP_BONUS }),
   死之羽: Object.freeze({ initiative: 1 }),
   理之冠: Object.freeze({}), // 由套装决定
 })

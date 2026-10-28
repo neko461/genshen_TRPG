@@ -1,7 +1,7 @@
 /**
  * 元素反应与伤害结算链。
  *
- * 对应 `数值定稿v1.0.md` 第七节与 `light_rule/elemental_reaction.md`。
+ * 对应 `finalized-stat-rules-v1.0.md` 第七节与 `light_rule/elemental_reaction.md`。
  *
  * 核心规则：
  * - 反应按**无序元素对**匹配（`水+冰` 与 `冰+水` 同判冻结）。

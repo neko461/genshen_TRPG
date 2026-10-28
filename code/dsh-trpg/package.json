@@ -1,7 +1,7 @@
 {
-  "name": "dsh-trpg",
+  "name": "genshin_trpg",
   "version": "0.0.2",
-  "description": "genshen_TRPG_v0.02：本地跑团与 DSH AI GM 工具，共用持久化规则运行时",
+  "description": "genshin_trpg_v0.02：本地跑团与 DSH AI GM 工具，共用持久化规则运行时",
   "keywords": [
     "dsh",
     "dsh-plugin",
@@ -29,7 +29,10 @@
     "test": "node scripts/test.mjs",
     "start": "node server/index.js",
     "doctor": "node scripts/doctor.mjs",
-    "dsh:check": "node scripts/check-dsh.mjs"
+    "dsh:check": "node scripts/check-dsh.mjs",
+    "usage:report": "node scripts/usage-report.mjs",
+    "context:bench": "node scripts/context-benchmark.mjs",
+    "characters:build": "node scripts/build-characters.mjs"
   },
   "dsh": {
     "bundle": {
@@ -56,5 +59,14 @@
     ".": "./lib/index.js",
     "./client": "./lib/client.js",
     "./package.json": "./package.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neko461/genshin_trpg.git",
+    "directory": "code/dsh-trpg"
+  },
+  "homepage": "https://github.com/neko461/genshin_trpg",
+  "bugs": {
+    "url": "https://github.com/neko461/genshin_trpg/issues"
   }
 }

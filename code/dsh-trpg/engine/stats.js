@@ -1,13 +1,13 @@
 import { resolveArtifactSet, weaponStats } from './gear.js'
-import { maxHpFor } from './rules.js'
+import { maxHpFor, ARTIFACT_HP_BONUS } from './rules.js'
 
 export function deriveStats(actor) {
   const gear = actor.gear ?? { artifacts: {} }
   const set = resolveArtifactSet(Object.values(gear.artifacts ?? {}).filter(Boolean))
   const totals = { ...set.totals }
   const two = {
-    冒险家: { hp: 30 }, 幸运儿: { reduction: 10 }, 游医: { healingBonus: 0.2 }, 学士: { reactionBonus: 15 },
-    战狂: { damage: 10 }, 流放者: { energyMax: 1 }, 角斗士的终幕礼: { damage: 15 }, 追忆之注连: { hp: 30 },
+    冒险家: { hp: ARTIFACT_HP_BONUS }, 幸运儿: { reduction: 10 }, 游医: { healingBonus: 0.2 }, 学士: { reactionBonus: 15 },
+    战狂: { damage: 10 }, 流放者: { energyMax: 1 }, 角斗士的终幕礼: { damage: 15 }, 追忆之注连: { hp: ARTIFACT_HP_BONUS },
     翠绿之影: { reactionBonus: 15 }, 如雷的盛怒: { initiative: 2 }, 悠古的磐岩: { threat: 0.5 },
   }[set.activeTwo] ?? {}
   for (const [k, v] of Object.entries(two)) totals[k] = (totals[k] ?? 0) + v

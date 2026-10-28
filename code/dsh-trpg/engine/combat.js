@@ -1,7 +1,7 @@
 /**
  * 战斗轮次。
  *
- * 对应 `数值定稿v1.0.md` 第三、八节。
+ * 对应 `finalized-stat-rules-v1.0.md` 第三、八节。
  *
  * 与剧情轮次的分工：**战斗轮次逐个行动、按个人先攻排序**；剧情轮次统一行动（见 scene.js）。
  *
@@ -14,7 +14,7 @@
 
 import { rollDice } from './rng.js'
 import { resolveDamage, findReaction } from './damage.js'
-import { resolveEnemy, validateEncounter } from './enemies.js'
+import { resolveEnemy, validateEncounter, ENCOUNTER_LIMITS } from './enemies.js'
 import {
   AOE_SCALE_PER_N,
   COMBAT_ROUND_CAP,
@@ -83,7 +83,12 @@ export function startCombat(input) {
   const n = input.partyN ?? input.party?.length ?? 1
   const soloMode = input.soloMode === true
   const definitions = (input.enemies ?? []).map(resolveEnemy)
-  const encounter = validateEncounter(definitions)
+  // 独行档按实际战斗行动者收紧敌方行动经济；旅行者实际同行并参战时才计入第二名行动者。
+  const combatants = input.party?.length ?? 0
+  const soloEncounter = soloMode
+    ? ENCOUNTER_LIMITS[combatants >= 2 ? 'accompanied' : 'independent']
+    : undefined
+  const encounter = validateEncounter(definitions, soloEncounter)
   const phases = input.phases ?? 1
   if (!Number.isInteger(phases) || phases < 1 || phases > 3) throw new Error('首领阶段数必须为 1–3')
   if (phases > 1 && !definitions.some((e) => e.threat === 3)) throw new Error('仅首领可开启多阶段')

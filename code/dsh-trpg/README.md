@@ -1,16 +1,24 @@
-# genshen_TRPG_v0.02
+# genshin_trpg_v0.02
 
 原神同人跑团版本 v0.02，包版本 0.0.2。固定试玩页面与 DSH AI GM 插件共用持久化运行时。
 
+## 安装到 DSH
+
+本项目已更名为 `genshin_trpg`，本轮尚未发布这个名称的 npm 包。目前从完整工作区根目录运行 `dsh plugin --profile web add link:./code/dsh-trpg` 链接本地源码；安装后按 DSH 提示重新加载插件或重启宿主。待本项目正式发布后，可在插件管理界面输入 `genshin_trpg`，或运行 `dsh plugin --profile web add genshin_trpg`。
+
+需要 Node.js 22 或更新版本；本包通过 `@deepseek-ai/dsh-tools` peer dependency 接入 DSH 宿主。实际兼容性取决于当前宿主提供的工具接口，更新宿主后应按项目的 DSH 接口检查说明复核。
+
+安装包仅包含运行时代码、主持提示、审核后的世界资料和文档；存档、用户数据、配置密钥及本地依赖不会打包。第一次开团前请阅读下面的 DSH 适配与存储说明，并在宿主里创建新的独立存档槽。
+
 ## 首轮试玩
 
-在工作区根目录双击“启动首轮测试.cmd”；也可以在插件目录运行 npm start。只需 Node.js 22+，本地试玩无需 npm install 或模型密钥。默认地址 http://127.0.0.1:17891。
+在工作区根目录双击“launch-first-test.cmd”；也可以在插件目录运行 npm start。只需 Node.js 22+，本地试玩无需 npm install 或模型密钥。默认地址 http://127.0.0.1:17891。
 
-先读工作区 docs/测试/第一轮测试指南.md。页面提供蒙德“遗失的货箱”固定短场景、建卡、剧情检定、真实战斗、物品、强化、恢复、读档与反馈导出。页面的“主动保存”会记录完整回溯点；“读取回溯点”将其复制为新的测试档分支，保留来源档及其后续记录。它没有连接模型，台词为预设文本。
+先读工作区 docs/tests/round-one-test-guide.md。页面提供蒙德“遗失的货箱”固定短场景、建卡、剧情检定、真实战斗、物品、强化、恢复、读档与反馈导出。页面的“主动保存”会记录完整回溯点；“读取回溯点”将其复制为新的测试档分支，保留来源档及其后续记录。它没有连接模型，台词为预设文本。
 
 ## 验证
 
-独立主线路径：正式new档默认未结识旅行者，可直接经骑士团、居民和现场证据参与风龙调查。trpg_party status读取met/joined/present；traveler操作依次按实际事件meet、join（玩家同意后playerConfirmed:true）、leave、return、dismiss。未入队或不在场的旅行者不参与协助、战斗、受击、物品或现场恢复。demo预设同行；旧档有旅行者且无明确不见面标记时兼容同行，不自动重写历史。独行遭遇仅HP采用0.6修正，杂兵HP至少20、劲敌至少30，单体至少12且不折扣，首领65/18/20，详见工作区 docs/规则/数值定稿v1.0.md；长期实机平衡仍待验收。
+独立主线路径：正式new档默认未结识旅行者，可直接经骑士团、居民和现场证据参与风龙调查。trpg_party status读取met/joined/present；traveler操作依次按实际事件meet、join（玩家同意后playerConfirmed:true）、leave、return、dismiss。未入队或不在场的旅行者不参与协助、战斗、受击、物品或现场恢复。demo预设同行；旧档有旅行者且无明确不见面标记时兼容同行，不自动重写历史。独行遭遇保留单体伤害，不再折扣；无队友时最多2点预算和2个独立敌人，旅行者实际参战时普通遭遇最多3点和3个独立敌人，可单独对抗一名首领。独行首领HP65/18/20等数值与预算详见工作区 docs/rules/finalized-stat-rules-v1.0.md；新限制待实机验收。
 
 - npm test：使用 scripts/test.mjs 收集测试，兼容 Windows，不依赖 shell 通配符。
 - 当前逐文件运行共 168 项通过：dice 14 + enemies 7 + engine 31 + items 4 + mainline 3 + participation 6 + player-check 12 + runtime 35 + server 3 + tags-runtime 5 + consistency 14 + known-fixes 12 + apply-hp 7 + thread-gate 15。
@@ -21,7 +29,7 @@
 
 ## DSH 适配
 
-lib/index.js 从宿主导入 @deepseek-ai/dsh-tools，注册 lib/tools.js 的 19 个工具。保留 cordis 挂载声明；需要在实际 DSH 环境验收，当前已安装 DSH 0.1.5-rc.2。使用系统提示词 prompt/gm-system.md。
+lib/index.js 从宿主导入 @deepseek-ai/dsh-tools，注册 lib/tools.js 的 19 个工具。保留 cordis 挂载声明。使用系统提示词 prompt/gm-system.md。宿主版本和插件接口可能演进，发布包不锁定某个 DSH 预览版；遇到工具注册错误时先按当前宿主版本运行 `npm run dsh:check`。
 
 每次工具调用必须传 mode、slot、input，建议带唯一 requestId；写操作可带 expectedRevision 防止旧页面覆盖新状态。不同会话不共享全局活动槽位。
 
@@ -52,7 +60,7 @@ DSH 会话顶部提供“主动保存”和“读取存档”按钮。它们使�
 
 ## 当前限制
 
-页面仅覆盖固定单人短场景。多人、关系、支援、共鸣和高级物品通过统一工具调用；无完整表单。NPC 一次性支援面向所有已在剧情中出现、并与玩家达到信任/羁绊的角色，每场景一名、战斗中一次 +1；当前不支持 NPC 独立回合、HP/重伤或高阶角色剧情技能，规则设计见 docs/规则/同伴与高阶角色战斗介入机制.md。专长仅记录描述。敌方元素攻击与玩家侧使用同一条元素反应链（反应、消耗附着、冻结/减伤/持续伤害/结晶护盾），未命中不触发也不消耗附着。lore 使用审核子集，不扫描隐藏原稿。完整自由叙事需要模型宿主，真实 DSH 集成待你所在环境验收。
+页面仅覆盖固定单人短场景。多人、关系、支援、共鸣和高级物品通过统一工具调用；无完整表单。NPC 一次性支援面向所有已在剧情中出现、并与玩家达到信任/羁绊的角色，每场景一名、战斗中一次 +1；当前不支持 NPC 独立回合、HP/重伤或高阶角色剧情技能，规则设计见 docs/rules/companion-and-high-tier-combat-intervention.md。专长仅记录描述。敌方元素攻击与玩家侧使用同一条元素反应链（反应、消耗附着、冻结/减伤/持续伤害/结晶护盾），未命中不触发也不消耗附着。lore 使用审核子集，不扫描隐藏原稿。完整自由叙事需要模型宿主，真实 DSH 集成待你所在环境验收。
 
 `trpg_recap` 与 `trpg_save load` 会返回 `warnings`：场景开局日与当前战役日不一致时给出 `scene_day_drift`，提示按事实关场并重述当前日目标。旧档缺 `scene.openDay` 时从日志中该场景的 open 事件只读推导，不写回存档。`sceneOpenDay` 同步返回推导结果（无法确证时为 null）。
 
@@ -76,10 +84,29 @@ DSH 会话顶部提供“主动保存”和“读取存档”按钮。它们使�
 
 ## 本地链接插件的 DSH 依赖检查
 
-使用 link: 挂载前，在本插件目录执行 npm install --ignore-scripts，再执行 npm run dsh:check。ESM 从链接的真实源码目录解析依赖；仅把插件加入 profile 不会为源码目录安装 peerDependencies。当前实际宿主版本为 0.1.5-rc.2，排障时使用同版本的 @deepseek-ai/dsh-tools。该检查使用真实 defineTool 注册全部 19 个工具，并验证只读调用，不创建战役。
+使用 link: 挂载前，在本插件目录执行 npm install --ignore-scripts，再执行 npm run dsh:check。ESM 从链接的真实源码目录解析依赖；仅把插件加入 profile 不会为源码目录安装 peerDependencies。排障时请使用与当前宿主相匹配的 @deepseek-ai/dsh-tools。该检查使用真实 defineTool 注册全部 19 个工具，并验证只读调用，不创建战役。
 
 输出的 value schema 不能包含 required；required 仅用于参数声明。纯运行时测试通过不能替代此宿主接口检查。
 
 ## 实测缺口修复（2026-10-17）
 
 trpg_item transfer将物品转交给队外叙事NPC，按quantity扣共享库存，记录recipient/reason/sourceId；同requestId幂等，同sourceId不能再次扣除，不治疗。publicSummary由真实结算字段生成，GM须简短写入正文。新战斗需预先声明retreatCost，低档成功才实际支付补给/物品或记录具体位置损失。addThread可登记deadlineDay/deadlineConsequence；逾期提示，closeThread须resolution。时限并不自动识别自然语言，位置后果仍须GM落实。
+
+规则查询支持 `trpg_rules input:{scope:"creation"}`，另有 checks/combat/equipment/recovery。省略 scope 或 all 保留完整返回。工具输出采用紧凑 JSON，仍保留骰子、公开结算与完整状态字段。无同伴独行仍可单独挑战一名首领（不可附带其他敌人），普通遭遇仍限2点/2单位。
+
+## 模型上下文与资料加载（2026-10-28）
+
+DSH新团opening默认分层：返回核心主持契约、当前地区与guidancePlan。按阶段读取细则，已在上下文中的相同资料可沿用；input.profile=full可读取原完整两份提示词。guidance新增core/creation/chapter/writing-full/geography/difficulty/companions/catalog；mainline现在包含节奏与调查完整要求。chapter可传station，省略时按本槽当前站点；sectionId使用catalog中的固定ID。旧槽位特例只对对应档案生效。
+
+常规工具正文包含本次结算、current及精确delta，标记stateComplete=false。角色、世界和库存变化保留在delta；缺少baseRevision基线、上下文压缩后不确定时先trpg_save load完整恢复。load/status/export、state get、recap和幂等重放保留完整状态，顶层view=full可要求任意工具返回完整原值。骰卡继续读取顶层check/damage/hp，玩家剧情篇幅仍按原规范。
+
+每个Runtime复用有界Journal缓存，默认8实例及16MiB原日志字节；目录安全检查、外部改写校验、事务锁及版本校验继续执行。
+
+可运行以下本地诊断：
+
+- npm run context:bench：临时夹具比较完整输出与模型正文字符量，自动清理，不访问真实存档或模型。
+- npm run usage:report：查看DSH实际报告的输入、输出与缓存计数。调用过跑团工具后的会话usage记录在工作区save/telemetry/dsh-usage.jsonl，未报告字段保留null；TRPG_USAGE_LOG=0可关闭。统计不保存对话/工具参数，不代表所有请求，也不把字符量转换成账单金额。
+
+完整接口与恢复约定见工作区docs/design/model-context-and-guidance-protocol.md。代码更新需要宿主重载后进入运行实例；已有会话压缩后先完整load恢复。
+
+角色资料：trpg_char search(query,region?,limit?)搜索候选；profile(query或id)按需读取一个角色的text，默认按存档阶段筛选，未建档为蒙德。仅供GM后台扮演，禁止级正文不返回，玩家知识仍用trpg_lore。人物登场/交谈前按需检索，已有相同上下文可沿用。开发工作区的character_setting/characters/*.json为正本；npm run characters:build生成data/characters及MD兼容镜像。安装包已含运行资料，无需访问工作区原稿。

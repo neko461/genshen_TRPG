@@ -1,6 +1,6 @@
 // Native DSH client module. React and the slot registry are supplied by the host.
 window.__ModuleLoader__.load({
-  id: 'dsh-trpg',
+  id: 'genshin_trpg',
   factory(require) {
     const React = require('react')
     const h = React.createElement
@@ -59,6 +59,10 @@ window.__ModuleLoader__.load({
           h('div', { className: 'trpg-map-viewport' }, h('iframe', { src: mapUrl, title: '原神官方提瓦特地图', className: 'trpg-map-frame', style: expanded ? { height: '100%' } : undefined, referrerPolicy: 'no-referrer', sandbox: 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox', onLoad: () => setLoading(false) }))))
     }
     let dshSessions
+    let dshUiWorkspace
+    function getBranchConversation(result, checkpoints, selectedId) {
+      return result?.conversation ?? checkpoints.find(checkpoint => checkpoint.id === selectedId)?.conversation ?? null
+    }
     function latestConversationPosition(sessionId) {
       const entries = dshSessions?.binding(sessionId)?.eventSource.getSnapshot().entries ?? []
       const seqs = entries
@@ -68,7 +72,7 @@ window.__ModuleLoader__.load({
         .filter(Number.isSafeInteger)
       return seqs.length ? { sessionId, atSeq: Math.max(...seqs) } : null
     }
-    function SaveControl({ sessionId, open: openSession }) {
+    function SaveControl({ sessionId }) {
       const [panel, setPanel] = React.useState(null)
       const [mode, setMode] = React.useState('solo')
       const [slots, setSlots] = React.useState([])
@@ -81,7 +85,7 @@ window.__ModuleLoader__.load({
       const [busy, setBusy] = React.useState(false)
       const [status, setStatus] = React.useState('')
       const [confirmed, setConfirmed] = React.useState(false)
-      const slotKey = `dsh-trpg-slot-${sessionId}`
+      const slotKey = `genshin_trpg-slot-${sessionId}`
       const request = async (body) => {
         const response = await fetch('api/trpg-checkpoints', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
         const text = await response.text()
@@ -89,7 +93,7 @@ window.__ModuleLoader__.load({
         try { data = JSON.parse(text) }
         catch {
           if (response.status === 404 || /^not found\s*$/i.test(text.trim())) {
-            throw new Error('DSH 没有找到存档接口。请重载 dsh-trpg 插件并刷新本页后重试；现有存档没有被修改。')
+            throw new Error('DSH 没有找到存档接口。请重载 genshin_trpg 插件并刷新本页后重试；现有存档没有被修改。')
           }
           throw new Error(`存档接口返回了非 JSON 内容（HTTP ${response.status}）：${text.slice(0, 160) || '空响应'}`)
         }
@@ -99,7 +103,7 @@ window.__ModuleLoader__.load({
       const refreshSlots = async (nextMode = mode) => {
         const found = await request({ op: 'slots', mode: nextMode, slot: 'dsh_ui' })
         setSlots(found.slots)
-        const remembered = localStorage.getItem(slotKey)
+        const remembered = localStorage.getItem(slotKey) ?? localStorage.getItem(`dsh-trpg-slot-${sessionId}`)
         const nextSlot = found.slots.includes(remembered) ? remembered : found.slots.length === 1 ? found.slots[0] : ''
         setSlot(nextSlot)
         if (nextSlot) localStorage.setItem(slotKey, nextSlot)
@@ -161,18 +165,23 @@ window.__ModuleLoader__.load({
         setBusy(true); setStatus('正在创建回溯分支…')
         try {
           const result = await request({ op: 'branch', mode, slot, checkpointId: selected, targetSlot, playerConfirmed: true })
+          // Older Host adapters may omit conversation from the branch response even
+          // though the checkpoint list already contains the saved DSH position.
+          const conversation = getBranchConversation(result, checkpoints, selected)
           let chatBranched = false
           let status = `已创建游戏进度「${result.state.title}」的新存档 ${targetSlot}。\n${result.state.timeline.name} · ${result.state.world.location} · 第 ${result.state.world.day} 日 · 修订 ${result.source.revision}`
-          if (result.conversation && dshSessions?.fork && typeof openSession === 'function') {
+          if (conversation && dshSessions?.fork && typeof dshUiWorkspace?.openSession === 'function') {
             try {
-              const childId = await dshSessions.fork({ sessionId: result.conversation.sessionId, atSeq: result.conversation.atSeq, increaseTitle: true })
-              localStorage.setItem(`dsh-trpg-slot-${childId}`, targetSlot)
+              const childId = await dshSessions.fork({ sessionId: conversation.sessionId, atSeq: conversation.atSeq, increaseTitle: true })
+              localStorage.setItem(`genshin_trpg-slot-${childId}`, targetSlot)
               chatBranched = true
-              openSession(childId)
-              status += `\n已从保存时的聊天位置创建并打开 DSH 对话分支（消息序号 ${result.conversation.atSeq}）。`
+              dshUiWorkspace.openSession(childId)
+              status += `\n已从保存时的聊天位置创建并打开 DSH 对话分支（消息序号 ${conversation.atSeq}）。`
             } catch (error) {
               status += `\nDSH 对话分支创建失败：${error.message}。当前聊天仍使用原存档选择，原聊天和源存档均保留。`
             }
+          } else if (conversation) {
+            status += '\n回溯点已记录聊天位置，但当前 DSH 宿主没有提供可用的自动分支接口；游戏状态已恢复，原聊天仍保留。'
           } else {
             status += '\n该进度点没有可用的 DSH 会话位置，因此只创建了游戏状态回溯；当前聊天和存档选择保持不变。请先在 DSH 中从对应消息手动分支，再选择新存档继续。'
           }
@@ -271,12 +280,13 @@ window.__ModuleLoader__.load({
         : h('details', null, h('summary', null, '战斗记录'), h('pre', { style: { whiteSpace: 'pre-wrap', maxHeight: 260, overflow: 'auto' } }, model.error ?? JSON.stringify(model.value ?? model.input, null, 2)))
     }
     return {
-      inject: ['slots', 'sessions'],
+      inject: ['slots', 'sessions', 'uiWorkspace'],
       apply(ctx) {
         dshSessions = ctx.sessions
+        dshUiWorkspace = ctx.uiWorkspace
         ctx.effect(() => {
           const style = document.createElement('style')
-          style.dataset.pluginCss = 'dsh-trpg/dice'
+          style.dataset.pluginCss = 'genshin_trpg/dice'
           style.textContent = css + mapCss + saveCss
           document.head.append(style)
           return () => style.remove()

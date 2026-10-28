@@ -1,7 +1,7 @@
 /**
  * 装备：武器与圣遗物。
  *
- * 对应 `数值定稿v1.0.md` 第五、六节与 `world_setting/weapon_setting.md`。
+ * 对应 `finalized-stat-rules-v1.0.md` 第五、六节与 `world_setting/weapon_setting.md`。
  *
  * 设计要点：
  * - 圣遗物 **3 槽位**（生之花 / 死之羽 / 理之冠），**2件套 / 3件套**。
@@ -11,6 +11,7 @@
  */
 
 import {
+  ARTIFACT_HP_BONUS,
   ARTIFACT_SLOTS,
   ARTIFACT_SLOT_BASE,
   ARTIFACT_UPGRADE_CAP,
@@ -33,12 +34,12 @@ export { ARTIFACT_SLOTS }
  * - `two`：2件套效果（从 ★★★ 起生效）
  * - `three`：3件套效果（从 ★★★★ 起生效）
  *
- * 数值换算口径：**原神 1000 原始生命 → 30 HP**。
+ * 当前生命加值按本团战斗尺度统一压缩；单件生之花基础 +10 HP。
  */
 export const ARTIFACT_SETS = Object.freeze({
   冒险家: Object.freeze({
-    slot3: { hp: 30 },
-    two: '生命值上限提升 30 点',
+    slot3: { hp: ARTIFACT_HP_BONUS },
+    two: `生命值上限提升 ${ARTIFACT_HP_BONUS} 点`,
     three: '实际获得宝箱奖励后恢复 30% 已损失 HP；每场景一次，同一宝箱不重复触发',
   }),
   幸运儿: Object.freeze({
@@ -72,8 +73,8 @@ export const ARTIFACT_SETS = Object.freeze({
     three: '本轮未移动时伤害 +20；大成功时额外造成 30 点伤害',
   }),
   追忆之注连: Object.freeze({
-    slot3: { hp: 30 },
-    two: '生命值上限提升 30 点',
+    slot3: { hp: ARTIFACT_HP_BONUS },
+    two: `生命值上限提升 ${ARTIFACT_HP_BONUS} 点`,
     three: '每场战斗首次被命中时，额外减伤 15；未命中不消耗',
   }),
   翠绿之影: Object.freeze({
@@ -92,7 +93,7 @@ export const ARTIFACT_SETS = Object.freeze({
     three: '每场战斗一次，可将对友方的一次伤害转移给自己（转移后 −10）',
   }),
   沉沦之心: Object.freeze({
-    slot3: { hp: 30 },
+    slot3: { hp: ARTIFACT_HP_BONUS },
     two: '每场战斗结束恢复 15 点 HP',
     three: '元素能量上限 +1；每场战斗一次元素技不消耗能量',
   }),

@@ -23,7 +23,7 @@ test('强化不放大或抹去先攻、仇恨、能量与比例，HP 仍增长',
       assert.equal(artifactBonus(a)[key], expected)
     }
   }
-  assert.equal(artifactBonus(makeArtifact({ set: '冒险家', slot: '生之花', quality: 5, upgrade: 4 })).hp, 60)
+  assert.equal(artifactBonus(makeArtifact({ set: '冒险家', slot: '生之花', quality: 5, upgrade: 4 })).hp, 20)
 })
 
 test('恢复返回实际治疗量，扎营回能但不清重伤', () => {

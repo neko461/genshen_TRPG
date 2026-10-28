@@ -216,12 +216,13 @@ test('战斗胜利与轮次均持久化，持续防御会在第4轮结束', (t) 
 test('装备强化真实消耗材料与补给，刷新 HP 并动态跟随旅行者', (t) => {
   const f = fixture(t)
   const equipped = f.call('trpg_gear', { op: 'equip', actor: 'pc', item: 'flower' }).state
-  assert.equal(equipped.characters.pc.state.max_hp, 150)
+  assert.equal(equipped.characters.pc.state.max_hp, 130)
   assert.equal(equipped.characters.pc.state.hp, 120, '穿戴不白送治疗')
-  assert.equal(equipped.characters.traveler.state.max_hp, 120)
+  assert.equal(equipped.characters.traveler.state.max_hp, 100)
   const upgraded = f.call('trpg_gear', { op: 'upgrade', actor: 'pc', slot: '生之花', material: 'material' }).state
   assert.equal(upgraded.supplies, 2); assert.equal(upgraded.inventory.material.quantity, 0)
-  assert.equal(upgraded.characters.pc.state.max_hp, 160)
+  assert.equal(upgraded.characters.pc.state.max_hp, 135)
+  assert.equal(upgraded.characters.traveler.state.max_hp, 105)
   assert.throws(() => f.call('trpg_gear', { op: 'upgrade', actor: 'pc', slot: '生之花', material: 'material' }))
 })
 

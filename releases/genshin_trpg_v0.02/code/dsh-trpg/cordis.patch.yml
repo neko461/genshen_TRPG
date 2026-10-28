@@ -1,0 +1,15 @@
+# ============================================================================
+# genshin_trpg —— DSH bundle patch
+# ============================================================================
+# 这是插件的"挂载声明"。DSH 启动时按 bundle 层栈叠加各插件 patch，
+# 本文件会把跑团工具集插入 Web profile 的配置树。
+#
+# 安装方式：
+#   dsh plugin --profile web add link:./code/dsh-trpg
+# 或发布到 npm 后：
+#   dsh plugin --profile web add genshin_trpg
+# ============================================================================
+
+- insert:
+    - id: genshin_trpg
+      name: genshin_trpg

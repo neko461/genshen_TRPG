@@ -51,5 +51,8 @@ const guidance = await character.execute(guidanceArgs, { signal: new AbortContro
 assert.equal(guidance.audience, 'GM')
 assert.match(JSON.stringify(guidance), /玩家明确写出的行动范围、禁止事项、条件和停止点/)
 assert.match(JSON.stringify(guidance), /检定卡的目的也必须与玩家授权一致/)
+assert.match(JSON.stringify(guidance), /由玩家决定目标、办法和承担的风险/)
+assert.match(JSON.stringify(guidance), /预设行动菜单限制玩家/)
+assert.match(JSON.stringify(guidance), /NPC替玩家解决了关键问题/)
 assert.equal(fs.existsSync(new URL('../../../save/slots/solo/dsh_check', import.meta.url)), false)
 console.log('DSH 检查通过：19 个工具注册、存档路由只读枚举、writing 指引可读取、参数校验正常；未创建或改写存档。')

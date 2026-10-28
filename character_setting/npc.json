@@ -1,38 +1,12 @@
 {
-  "schema_version": "0.01-template",
-  "type": "npc",
+  "schemaVersion": 1,
+  "kind": "character",
+  "id": "",
   "name": "",
+  "aliases": [],
   "region": "",
-  "element": null,
-  "weapon": "",
-  "spoiler_level": "公开",
-  "public": {
-    "identity": "",
-    "personality": [],
-    "speech_style": "",
-    "public_info": [],
-    "relationships": []
-  },
-  "gm_only": {
-    "true_identity": "",
-    "secrets": [],
-    "goals": [],
-    "abilities": [],
-    "gm_notes": [],
-    "plot_hooks": []
-  },
-  "attributes": {
-    "体魄": 0,
-    "灵巧": 0,
-    "心智": 0,
-    "感知": 0,
-    "交涉": 0,
-    "意志": 0
-  },
-  "state": {
-    "hp": 120,
-    "max_hp": 120,
-    "status": []
-  },
+  "station": 1,
+  "level": "公开",
+  "text": "角色正文，包括身份、说话风格、背景、关系与知情边界。隐藏内容标注仅供GM，禁止级正文不会由检索返回。",
   "template": true
 }

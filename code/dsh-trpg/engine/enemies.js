@@ -75,10 +75,19 @@ export function resolveEnemy(input) {
 }
 
 /** 限制整场预算，避免每个敌人都按完整首领预算叠加。 */
-export function validateEncounter(enemies) {
+export const ENCOUNTER_LIMITS = Object.freeze({
+  standard: Object.freeze({ budget: 4, maxUnits: 4 }),
+  independent: Object.freeze({ budget: 2, maxUnits: 2, soloBossRules: true, allowBossOnly: true }),
+  accompanied: Object.freeze({ budget: 3, maxUnits: 3, soloBossRules: true, allowBossOnly: true }),
+})
+
+export function validateEncounter(enemies, { budget = ENCOUNTER_BUDGET, maxUnits = 4, soloBossRules = false, allowBossOnly = false } = {}) {
   if (!Array.isArray(enemies) || enemies.length === 0) throw new Error('遭遇至少需要 1 个敌人单位')
-  if (enemies.length > 4) throw new Error('遭遇最多 4 个独立单位，更多敌人须合并为群体或背景战线')
+  if (enemies.length > maxUnits) throw new Error(`本场遭遇最多 ${maxUnits} 个独立单位；更多敌人须作为背景威胁或分批登场`)
+  const bossOnly = soloBossRules && allowBossOnly && enemies.length === 1 && enemies[0].threat === 3
+  if (soloBossRules && enemies.some((enemy) => enemy.threat === 3) && !bossOnly) throw new Error('独行首领遭遇须为唯一敌方单位，不能额外附带其他敌人')
   const cost = enemies.reduce((sum, enemy) => sum + ENCOUNTER_COST[enemy.threat], 0)
-  if (!Number.isFinite(cost) || cost > ENCOUNTER_BUDGET) throw new Error('遭遇超出 4 点预算：杂兵 1、劲敌 2、首领 4')
-  return { cost, budget: ENCOUNTER_BUDGET }
+  const effectiveBudget = bossOnly ? ENCOUNTER_COST[3] : budget
+  if (!Number.isFinite(cost) || cost > effectiveBudget) throw new Error(`遭遇超出 ${effectiveBudget} 点预算：杂兵 1、劲敌 2、首领 4`)
+  return { cost, budget: effectiveBudget }
 }

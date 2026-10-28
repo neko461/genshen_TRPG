@@ -3,12 +3,15 @@ import { defineTool } from '@deepseek-ai/dsh-tools'
 import { createTools } from './tools.js'
 import { Runtime } from '../engine/runtime.js'
 import { branchCheckpoint, createCheckpoint, listCheckpoints } from '../engine/checkpoints.js'
-export const name = 'dsh-trpg'
+import { createUsageMetrics } from './usage-metrics.js'
+export const name = 'genshin_trpg'
 export const inject = ['tools', 'userQuestions', 'connection']
 export function apply(ctx) {
   const root = process.env.TRPG_ROOT || fileURLToPath(new URL('../../..', import.meta.url))
   const askPlayer = ctx.userQuestions ? (request) => ctx.userQuestions.ask(request) : undefined
-  for (const tool of createTools({ root, askPlayer })) ctx.tools.register(defineTool(tool))
+  const metrics = createUsageMetrics(root, { enabled: process.env.TRPG_USAGE_LOG !== '0' })
+  if (typeof ctx.on === 'function') ctx.on('agent/assistant-stream', payload => metrics.observe(payload))
+  for (const tool of createTools({ root, askPlayer, onToolCall: agent => metrics.track(agent) })) ctx.tools.register(defineTool(tool))
   if (ctx.connection?.fetch) {
     const runtime = new Runtime({ root })
     ctx.effect(() => ctx.connection.fetch.register({
@@ -34,6 +37,6 @@ export function apply(ctx) {
           return Response.json({ ok: false, error: error.message }, { status: 400 })
         }
       },
-    }), 'dsh-trpg: save checkpoint route')
+    }), 'genshin_trpg: save checkpoint route')
   }
 }

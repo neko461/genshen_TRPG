@@ -8,7 +8,7 @@ import { BUILD_SCHEMES, validateBuild } from '../engine/rules.js'
 import { createTools } from '../lib/tools.js'
 const root = process.env.TRPG_ROOT || fileURLToPath(new URL('../../..', import.meta.url))
 assert(Number(process.versions.node.split('.')[0]) >= 22, '需要 Node.js 22 或更高版本')
-for (const p of ['center_setting/center_setting.md', 'docs/规则/时间轴.md', 'docs/规则/数值定稿v1.0.md', 'docs/规则/主线规则.md', 'docs/主持/主持手册.md']) assert(fs.existsSync(path.join(root, p)), `缺少 ${p}`)
+for (const p of ['center_setting/center_setting.md', 'docs/rules/timeline.md', 'docs/rules/finalized-stat-rules-v1.0.md', 'docs/rules/mainline-rules.md', 'docs/gm/gm-handbook.md']) assert(fs.existsSync(path.join(root, p)), `缺少 ${p}`)
 for (const value of Object.values(BUILD_SCHEMES)) assert(validateBuild(value).ok)
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'trpg-doctor-'))
 try {

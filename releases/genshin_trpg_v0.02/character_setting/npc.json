@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "kind": "character",
+  "id": "",
+  "name": "",
+  "aliases": [],
+  "region": "",
+  "station": 1,
+  "level": "公开",
+  "text": "角色正文，包括身份、说话风格、背景、关系与知情边界。隐藏内容标注仅供GM，禁止级正文不会由检索返回。",
+  "template": true
+}

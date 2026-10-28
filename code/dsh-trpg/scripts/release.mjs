@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
 const root = fileURLToPath(new URL('../../..', import.meta.url))
-const out = path.join(root, 'releases', 'genshen_TRPG_v0.02')
+const out = path.join(root, 'releases', 'genshin_trpg_v0.02')
 if (fs.existsSync(out)) throw new Error('版本目录已存在，不会覆盖；请先核对已有交付')
 fs.mkdirSync(out, { recursive: true })
 const manifest = []
@@ -26,10 +26,10 @@ function copyDir(relative, allowed = () => true) {
 }
 for (const dir of ['engine', 'lib', 'data', 'server', 'web', 'scripts', 'bin', 'prompt', 'test']) copyDir(`code/dsh-trpg/${dir}`)
 for (const file of ['package.json', 'cordis.patch.yml', 'README.md', 'DESIGN.md']) copyFile(`code/dsh-trpg/${file}`)
-for (const dir of ['center_setting', 'character_setting', 'world_setting', 'light_rule', 'user']) copyDir(dir, (p) => /\.(md|json)$/.test(p))
+for (const dir of ['center_setting', 'character_setting', 'world_setting', 'light_rule']) copyDir(dir, (p) => /\.(md|json)$/.test(p))
 copyDir('docs', p => /\.(md|png)$/.test(p))
-for (const file of ['README.md', '启动首轮测试.cmd', '启动AI跑团.cmd']) copyFile(file)
+for (const file of ['README.md', 'launch-first-test.cmd', 'launch-trpg.cmd']) copyFile(file)
 if (fs.existsSync(path.join(root, '试玩预览.png'))) copyFile('试玩预览.png')
 fs.mkdirSync(path.join(out, 'save'), { recursive: true })
-fs.writeFileSync(path.join(out, 'MANIFEST.json'), JSON.stringify({ version: 'genshen_TRPG_v0.02', builtAt: new Date().toISOString(), files: manifest }, null, 2) + '\n')
+fs.writeFileSync(path.join(out, 'MANIFEST.json'), JSON.stringify({ version: 'genshin_trpg_v0.02', builtAt: new Date().toISOString(), files: manifest }, null, 2) + '\n')
 console.log(`交付目录：${out}\n${manifest.length} 个文件；不包含存档、历史归档、记忆日志、依赖目录或密钥。`)

@@ -68,3 +68,22 @@ test('回溯点保存并恢复DSH会话消息位置，旧格式仍可只恢复�
   const invalid = createCheckpoint(f.root, 'solo', 'source', '非法会话标记', '', { sessionId: '', atSeq: -1 })
   assert.equal(invalid.conversation, null)
 })
+
+test('读取回溯点时接口漏返聊天位置会回退到已加载的存档列表', async () => {
+  const vm = await import('node:vm')
+  const client = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+  const helper = client.match(/function getBranchConversation\(result, checkpoints, selectedId\) \{[\s\S]*?\n    \}/)?.[0]
+  assert(helper, '客户端应定义读取分支聊天位置的兼容回退')
+  assert.match(client, /inject: \['slots', 'sessions', 'uiWorkspace'\]/)
+  assert.match(client, /dshUiWorkspace\.openSession\(childId\)/)
+  const getBranchConversation = vm.runInNewContext(`${helper}; getBranchConversation`)
+  const savedPosition = { sessionId: 'dsh-session-test', atSeq: 1689 }
+  const checkpointList = [{ id: 'cp_saved', conversation: savedPosition }]
+
+  assert.deepEqual(getBranchConversation({ state: {} }, checkpointList, 'cp_saved'), savedPosition)
+  assert.deepEqual(
+    getBranchConversation({ conversation: { sessionId: 'newer-response', atSeq: 1700 } }, checkpointList, 'cp_saved'),
+    { sessionId: 'newer-response', atSeq: 1700 },
+  )
+  assert.equal(getBranchConversation({ state: {} }, checkpointList, 'missing'), null)
+})
