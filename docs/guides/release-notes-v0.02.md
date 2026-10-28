@@ -1,6 +1,6 @@
 # genshin_trpg v0.02 版本说明
 
-更新日期：2026-10-28。包版本0.0.2，产品标识genshin_trpg_v0.02。本次在原2026-10-18的v0.02基础上整合当前工作区改动，发布到https://github.com/neko461/genshin_trpg。npm注册表发布与GitHub源码/ZIP发布是两个流程，本次不执行npm publish。
+更新日期：2026-10-28。包版本0.0.2，产品标识genshin_trpg_v0.02。本次在原2026-10-18的v0.02基础上整合当前工作区改动，发布到https://github.com/neko461/genshin_trpg。npm注册表发布与GitHub源码/ZIP发布是两个流程；2026-10-28已完成genshin_trpg@0.0.2公开发布，latest指向0.0.2。此前生成的项目ZIP保留发布时原始说明和校验值。
 
 ## 新增内容
 
@@ -27,3 +27,7 @@
 ## 当前实现边界
 
 云端房间、多人网页与MySQL同步尚未部署；单人本地使用不要求云资源。通用NPC独立战斗位、高阶角色数值技能和自动专长仍以工具已实现能力为界。模型正文质量、整章主线和长期平衡仍需实机继续验收。
+
+## npm发布核验
+
+账号neko461，版本0.0.2，latest=0.0.2；注册表实际下载tarball与已测试文件一致，SHA1=3fe250fb5a036eb035225fe4d0cfa34a7fab398c。安装命令：dsh plugin --profile web add genshin_trpg@0.0.2。

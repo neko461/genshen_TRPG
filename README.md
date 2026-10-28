@@ -47,7 +47,19 @@
 
 ## 安装与开始
 
-需要 Node.js 22+ 和可用的 DSH 宿主。本次已上传源码及完整项目 ZIP；**尚未发布 `genshin_trpg` 的 npm 注册表包**，请使用本地源码链接安装。
+需要 Node.js 22+ 和可用的 DSH 宿主。**npm包 `genshin_trpg@0.0.2` 已公开发布**，同时提供完整项目源码与ZIP。
+
+### 从npm安装
+
+在DSH插件管理中输入 `genshin_trpg`，或运行：
+
+```text
+dsh plugin --profile web add genshin_trpg@0.0.2
+```
+
+安装后按宿主提示重载或重启。npm包仅含插件运行资料；完整世界设定、测试及文档请下载项目ZIP。
+
+### 从源码安装
 
 1. 下载并解压发布包，或克隆仓库：
 

@@ -4,7 +4,7 @@
 
 ## 安装到 DSH
 
-本项目已更名为 `genshin_trpg`，本轮尚未发布这个名称的 npm 包。目前从完整工作区根目录运行 `dsh plugin --profile web add link:./code/dsh-trpg` 链接本地源码；安装后按 DSH 提示重新加载插件或重启宿主。待本项目正式发布后，可在插件管理界面输入 `genshin_trpg`，或运行 `dsh plugin --profile web add genshin_trpg`。
+插件与npm包名为 `genshin_trpg`。在 DSH 插件管理中选择从 npm 添加并输入 `genshin_trpg`，或运行 `dsh plugin --profile web add genshin_trpg@0.0.2`。按宿主提示重载插件或重启。开发者也可从完整工作区根目录运行 `dsh plugin --profile web add link:./code/dsh-trpg` 使用源码链接。
 
 需要 Node.js 22 或更新版本；本包通过 `@deepseek-ai/dsh-tools` peer dependency 接入 DSH 宿主。实际兼容性取决于当前宿主提供的工具接口，更新宿主后应按项目的 DSH 接口检查说明复核。
 
